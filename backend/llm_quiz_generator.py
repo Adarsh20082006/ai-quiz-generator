@@ -49,10 +49,11 @@ def generate_quiz(article_title: str, structured_content: dict, difficulty="Medi
     - title: <article title>
     - summary: <concise summary>
     - key_entities:
-        - people": ["Only names explicitly mentioned in text"](Maximum 5-7 most relevent people to the context),
-        - organizations": ["Only organizations explicitly mentioned in text"](Maximum 5 most relevent organizations),
-        - locations": ["Only locations explicitly present in text"](Maximum 5 important locations that most related to the context)
-    - sections: [...]
+        - people: ["List only names explicitly mentioned in the text. Include a maximum of 3, chosen by frequency of mention."]
+        - organizations: ["List only organizations explicitly mentioned in the text. Include a maximum of 3, chosen by frequency of mention."]
+        - locations: ["List only locations or country names explicitly present in the text. Include a maximum of 2."]
+    -sections: ["List 3–5 concise domain-level themes or hash-tag-like keywords that represent the main areas covered in the article."]
+
     - quiz: list of questions with:
         - question: text
         - options: [A, B, C, D]
@@ -87,7 +88,11 @@ def generate_quiz(article_title: str, structured_content: dict, difficulty="Medi
 
     chain = prompt | model | parser
     result = chain.invoke({"title": article_title, "content": relevant_text})
-    return result
+    result = chain.invoke({"title": article_title, "content": relevant_text})
 
+# Convert Pydantic model → Python dict
+    quiz_json = result.dict() if hasattr(result, "dict") else result.model_dump()
+
+    return quiz_json
 
 

@@ -12,7 +12,7 @@ def build_faiss_index(article_text: str):
     )
     chunks = text_splitter.split_text(article_text)
 
-    # ✅ Local embeddings (no API key, no limits)
+    # Local embeddings (no API key, no limits)
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
     vector_store = FAISS.from_texts(chunks, embedding=embeddings)
