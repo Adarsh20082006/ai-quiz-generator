@@ -1,41 +1,38 @@
+# scraper_service.py
 import json
 from fastapi import HTTPException
 from database import SessionLocal, Quiz
 from scraper import scrape_wikipedia
+from llm_quiz_generator import generate_quiz
 from datetime import datetime
 
-
-def get_or_create_scraped_data(url: str):
+def get_or_create_scraped_data(url: str, difficulty="Medium", selected_sections=None):
     db = SessionLocal()
     try:
-        # 🔹 1. Check cache
-        existing_quiz = db.query(Quiz).filter(Quiz.url == url).first()
-        if existing_quiz:
-            print("✅ Cache hit — returning stored data")
-            # Deserialize text to dict
-            return json.loads(existing_quiz.scraped_content)
+        existing = db.query(Quiz).filter(Quiz.url == url).first()
+        if existing:
+            print("Cache hit! — returning stored quiz")
+            return json.loads(existing.full_quiz_data)
 
-        # 🔹 2. Scrape fresh data
         scraped_data = scrape_wikipedia(url)
-        structured_json = json.dumps(scraped_data, ensure_ascii=False)
-
-        # 🔹 3. Save as text (stringified JSON)
-        new_quiz = Quiz(
+        quiz_output = generate_quiz(scraped_data["title"], scraped_data, difficulty, selected_sections)
+        quiz_json = quiz_output.dict()
+        new_entry = Quiz(
             url=url,
             title=scraped_data["title"],
             date_generated=datetime.utcnow(),
-            scraped_content=structured_json,  # Text field
-            full_quiz_data="{}"  # empty placeholder
+            scraped_content=json.dumps(scraped_data, ensure_ascii=False),
+            full_quiz_data=json.dumps(quiz_json, ensure_ascii=False)
         )
-        db.add(new_quiz)
+        db.add(new_entry)
         db.commit()
-        db.refresh(new_quiz)
-
-        print(f"✅ Scraped and stored structured data for '{scraped_data['title']}'")
-        return scraped_data
+        db.refresh(new_entry)
+        quiz_json["id"] = new_entry.id
+        print(f"✅ Stored quiz for '{scraped_data['title']}'")
+        return quiz_json
 
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error saving scraped data: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
     finally:
         db.close()
