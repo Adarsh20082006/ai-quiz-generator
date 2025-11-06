@@ -1,5 +1,6 @@
 # main.py
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, HttpUrl
 from scraper_service import get_or_create_scraped_data
 from database import SessionLocal, Quiz, init_db
@@ -9,6 +10,14 @@ import json
 init_db()
 app = FastAPI(title="AI Wiki Quiz Generator")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],  # allows OPTIONS, POST, GET, etc.
+    allow_headers=["*"],
+)
+
 class URLPreview(BaseModel):
     url: HttpUrl
 
@@ -17,13 +26,13 @@ class QuizRequest(BaseModel):
     difficulty: str
     sections: list[str] | None = None
 
-@app.post("/get-data",description='Getting data from wikipedia',tags=['Quiz'])
+@app.post("/generate_quiz",description='Getting data from wikipedia',tags=['Quiz'])
 def preview_article(payload: URLPreview):
     try:
         scraped = get_or_create_scraped_data(str(payload.url))
         sections = [s["heading"] for s in scraped["sections"]]
         print(f"Got {scraped['title']} data!")
-        return {"title": scraped["title"], "available_sections": sections}
+        return {"status":True,"title": scraped["title"], "available_sections": sections}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -47,7 +56,7 @@ def generate_quiz_endpoint(payload: QuizRequest):
             selected_sections=payload.sections
         )
         quiz_json['id']=existing.id
-        existing.full_quiz_data = json.dumps(quiz_json, ensure_ascii=False)# Serialize JSON string into a Python dictionary
+        existing.full_quiz_data = json.dumps(quiz_json, ensure_ascii=False)# Serialize Python dictionary into JSON string for database storage
         db.commit()
         db.refresh(existing)
 
