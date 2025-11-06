@@ -28,7 +28,7 @@ def preview_article(payload: URLPreview):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.put("/quiz", description='Update quiz record with generated AI quiz', tags=['Quiz'])
+@app.put("/generate_quiz", description='Update quiz record with generated AI quiz', tags=['Quiz'])
 def generate_quiz_endpoint(payload: QuizRequest):
     db = SessionLocal()
     try:
@@ -46,9 +46,8 @@ def generate_quiz_endpoint(payload: QuizRequest):
             difficulty=payload.difficulty,
             selected_sections=payload.sections
         )
-
-        # Update DB with quiz data
-        existing.full_quiz_data = json.dumps(quiz_json, ensure_ascii=False)
+        quiz_json['id']=existing.id
+        existing.full_quiz_data = json.dumps(quiz_json, ensure_ascii=False)# Serialize JSON string into a Python dictionary
         db.commit()
         db.refresh(existing)
 
@@ -58,5 +57,36 @@ def generate_quiz_endpoint(payload: QuizRequest):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error generating quiz: {str(e)}")
+    finally:
+        db.close()
+
+@app.get("/history", description='Getting the list of all saved quizzes.', tags=['Quiz'])
+def get_history():
+    db = SessionLocal()
+    try:
+        records = db.query(Quiz.id, Quiz.url, Quiz.title, Quiz.date_generated).all()
+        history = [
+            {
+                "id": r.id,
+                "url": r.url,
+                "title": r.title,
+                "date_generated": r.date_generated
+            }
+            for r in records
+        ]
+        return history
+    finally:
+        db.close()
+
+@app.get('/quiz/{quiz_id}',description="Getting the specific quiz based on the id", tags=['Quiz'])
+def get_quiz(quiz_id:int):
+    db=SessionLocal()
+    try:
+        record = db.query(Quiz.id, Quiz.title, Quiz.full_quiz_data).filter(Quiz.id == quiz_id).first()
+
+        if not record:
+            raise HTTPException(status_code=404, detail="Quiz not found.")
+        quiz_data = json.loads(record.full_quiz_data) # Deserialize JSON string into a Python dictionary
+        return {'title':record.title,'quiz_data':quiz_data}
     finally:
         db.close()
