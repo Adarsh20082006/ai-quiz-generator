@@ -1,0 +1,12 @@
+fastapi 
+uvicorn
+sqlalchemy
+beautifulsoup4
+lxml
+pymysql
+requests
+pydantic
+langchain-core
+langchain-community
+dotenv
+langchain-google-genai
