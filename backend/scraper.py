@@ -32,53 +32,62 @@ def scrape_wikipedia(url):
 
     content_div = remove_reference_links(content_div)
     content_div = remove_tables(content_div)
+    EXCLUDED_SECTIONS = {
+        "see also",
+        "notes",
+        "references",
+        "external links",
+        "further reading",
+        "citations",
+        "bibliography",
+        "footnotes",
+        "sources"
+    }
 
     sections = []
     current_section = None
     current_subsection = None
-    EXCLUDED_SECTIONS = {
-    "see also",
-    "notes",
-    "references",
-    "external links",
-    "further reading",
-    "citations",
-    "bibliography",
-    "footnotes",
-    "sources"
-    }
+
     for element in content_div.find_all(["h2", "h3", "p", "ul"], recursive=True):
+        # Handle new main section (h2)
         if element.name == "h2":
-            if current_section and element.get_text(strip=True).lower() not in EXCLUDED_SECTIONS:
+            # Get the raw section title (without [edit])
+            heading_text = element.get_text(" ", strip=True).replace("[edit]", "").strip().lower()
+
+            # If the previous section exists, append it before starting a new one
+            if current_section and current_section["heading"].lower() not in EXCLUDED_SECTIONS:
                 if current_subsection:
                     current_section["subsections"].append(current_subsection)
                     current_subsection = None
                 sections.append(current_section)
-            current_section = {"heading": element.get_text(" ", strip=True), "content": "", "subsections": []}
 
-        elif element.name == "h3":
-            if current_subsection:
-                current_section["subsections"].append(current_subsection)
-            current_subsection = {"subheading": element.get_text(" ", strip=True), "content": ""}
+            # Start a new section only if NOT excluded
+            if heading_text not in EXCLUDED_SECTIONS:
+                current_section = {"heading": heading_text.title(), "content": "", "subsections": []}
+            else:
+                current_section = None  # skip excluded section entirely
 
-        elif element.name == "p":
+        # Handle subsections (h3)
+        elif element.name == "h3" and current_section:
+            subheading_text = element.get_text(" ", strip=True).replace("[edit]", "").strip().lower()
+            if subheading_text not in EXCLUDED_SECTIONS:
+                if current_subsection:
+                    current_section["subsections"].append(current_subsection)
+                current_subsection = {"subheading": subheading_text.title(), "content": ""}
+
+        # Handle paragraph or list content
+        elif element.name in ["p", "ul"]:
             text = element.get_text(" ", strip=True)
             if current_subsection:
                 current_subsection["content"] += " " + text
             elif current_section:
                 current_section["content"] += " " + text
 
-        elif element.name == "ul":
-            items = [li.get_text(" ", strip=True) for li in element.find_all("li")]
-            text = "\n".join(f"• {i}" for i in items if i)
-            if current_subsection:
-                current_subsection["content"] += "\n" + text
-            elif current_section:
-                current_section["content"] += "\n" + text
-
-    if current_subsection:
-        current_section["subsections"].append(current_subsection)
-    if current_section:
+    # Append last section at end
+    if current_section and current_section["heading"].lower() not in EXCLUDED_SECTIONS:
+        if current_subsection:
+            current_section["subsections"].append(current_subsection)
         sections.append(current_section)
-
     return {"title": title, "sections": sections}
+
+

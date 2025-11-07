@@ -5,15 +5,18 @@ import QuizDisplay from "../components/QuizDisplay";
 
 export default function QuizDetail() {
     const { id } = useParams();
-    const { state } = useLocation(); // may contain { quiz }
-    const [quiz, setQuiz] = useState(state?.quiz || null);
+    // const { state } = useLocation(); // may contain { quiz }
+    const [quiz, setQuiz] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
         if (!quiz) {
-            getQuizById(id).then(setQuiz).catch(() => alert("Failed to load quiz"));
+            getQuizById(id)
+                .then((data) => setQuiz(data))
+                .catch(() => setError("Failed to load quiz. Please try again."))
+                .finally(console.log("Got the individual quiz data"));
         }
-    }, [id, quiz]);
+    }, [id]);
 
     return (
         <div className="min-h-screen p-4 max-w-3xl mx-auto">

@@ -12,10 +12,7 @@ export default function Landing() {
                 <Link to="/generate_quiz" className="block bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-3 font-medium shadow-sm">
                     Generate Quiz
                 </Link>
-                <Link to="/take_quiz" className="block bg-green-500 hover:bg-green-600 text-white rounded-lg py-3 font-medium shadow-sm">
-                    Take Quiz
-                </Link>
-                <Link to="/history" className="block bg-slate-800 hover:bg-slate-900 text-white rounded-lg py-3 font-medium shadow-sm">
+                <Link to="/history" className="block bg-green-500 hover:bg-green-600 text-white rounded-lg py-3 font-medium shadow-sm">
                     View History
                 </Link>
             </div>

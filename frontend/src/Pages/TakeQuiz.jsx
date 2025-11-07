@@ -6,7 +6,7 @@ export default function TakeQuiz() {
     const { state } = useLocation(); // expects { quiz }
     const navigate = useNavigate();
     const quiz = state?.quiz;
-
+    console.log(quiz);
     const [idx, setIdx] = useState(0);
     const [answers, setAnswers] = useState([]);
     const [score, setScore] = useState(0);
@@ -16,7 +16,7 @@ export default function TakeQuiz() {
     }, [quiz, navigate]);
 
     if (!quiz) return null;
-    const questions = quiz.quiz || [];
+    const questions = quiz.quiz_data.quiz || [];
 
     const onSelect = (opt) => {
         const correct = questions[idx].answer;

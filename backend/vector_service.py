@@ -6,8 +6,8 @@ from langchain_huggingface import HuggingFaceEmbeddings
 def build_faiss_index(article_text: str):
     """Split text and embed locally (no Gemini quota)."""
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=150,
+        chunk_size=2000,
+        chunk_overlap=500,
         separators=["\n\n", "\n", ".", "!", "?"]
     )
     chunks = text_splitter.split_text(article_text)

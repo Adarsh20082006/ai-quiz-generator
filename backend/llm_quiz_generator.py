@@ -12,7 +12,7 @@ parser = PydanticOutputParser(pydantic_object=QuizOutput)
 model = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",
     google_api_key=os.getenv("GEMINI_API_KEY"),
-    temperature=0.8
+    temperature=0.5
 )
 
 def generate_quiz(article_title: str, structured_content: dict, difficulty="Medium", selected_sections=None):
@@ -37,51 +37,67 @@ def generate_quiz(article_title: str, structured_content: dict, difficulty="Medi
         partial_variables={
             "format_instructions": parser.get_format_instructions()
         },
-        template="""
-    You are an expert quiz generator. Create a JSON-formatted quiz based strictly on the given article.
+        template="""   
+        You are an expert educational quiz generator. Your goal is to create a JSON-formatted quiz strictly based on the given Wikipedia article content — ensuring factual accuracy, coverage diversity, and teaching effectiveness.
 
-    Instructions:
-    - Carefully read the content.
-    - Extract key points, sections, entities, and create high-quality MCQs based only on article content.
-    - No hallucination. Avoid any external or uncertain facts.
+        'Article Title:' {title}  
+        'Article Content:' 
+        {content}  
 
-    Output JSON Structure:
-    - title: <article title>
-    - summary: <concise summary>
-    - key_entities:
-        - people: ["List only names explicitly mentioned in the text. Include a maximum of 3, chosen by frequency of mention."]
-        - organizations: ["List only organizations explicitly mentioned in the text. Include a maximum of 3, chosen by frequency of mention."]
-        - locations: ["List only locations or country names explicitly present in the text. Include a maximum of 2."]
-    -sections: ["List 3–5 concise domain-level themes or hash-tag-like keywords that represent the main areas covered in the article."]
+        {format_instructions}
 
-    - quiz: list of questions with:
-        - question: text
-        - options: [A, B, C, D]
-        - answer: correct option text
-        - explanation: short reason (1 sentence max)
-        - difficulty: easy | medium | hard
-    - related_topics: 1-3 Wikipedia topics for further learning
+        Follow all the instructions carefully.
 
-    Difficulty Ratios (based on mode):
-    - Easy mode → 70% easy, 20% medium, 10% hard
-    - Medium mode → 25% easy, 60% medium, 15% hard
-    - Hard mode → 10% easy, 30% medium, 60% hard
+        Primary Objectives:
+        - Transform the article into a 'rich, structured quiz dataset'.
+        - Ensure every question, summary point, and entity is 'fully grounded in the provided text'.
+        - Never include hallucinated, assumed, or guessed information.
+        - Maintain educational value by making each question teach something meaningful.
 
-    Additional Requirements:
-    - Questions must be diverse, accurate, and teaching-focused.
-    - Extract the questions which are worth knowing answer to user.
-    - Easy: Direct recall (what, when, who, where)
-    - Medium: Slight reasoning or contextual
-    - Hard: Indirect, deep, or surprising
-    - Never include hallucinated or guessed facts.
-    - Explanations must be short, useful, and non-confusing.
-    - Avoid redundant or vague options.
+        Additional Rules & Guidelines
 
-    Article Title: {title}
-    Article Content:
-    {content}
+        Question Generation:
+        - Create '8 questions' from the article.
+        - Ensure a 'good balance' of direct recall and reasoning questions.
+        - Each question should test 'understanding' — not just memory.
+        - Avoid repeating similar facts or rephrasing existing questions.
 
-    {format_instructions}
+        Difficulty Distribution:
+        Use these ratios for each mode:
+        - Easy mode → 70% easy, 20% medium, 10% hard  
+        - Medium mode → 25% easy, 60% medium, 15% hard  
+        - Hard mode → 10% easy, 30% medium, 60% hard  
+
+        > “Easy” = direct factual (who/what/when/where)  
+        > “Medium” = contextual (why/how/simple reasoning)  
+        > “Hard” = analytical, indirect, or critical facts.
+
+        Explanation Rules:
+        - Each explanation should be concise and crisp.
+        - Should clarify why the answer is correct.
+        - Avoid vague wording like “as per the article” — don't specific like this, Just give response by considering all the data is valid.
+
+        Summary Rules:
+        - The summary should not be generic — it should feel **tailored** to the topic.
+
+        Key Entity Extraction:
+        - Extract only 'explicit mentions' — not inferred connections.
+        - Prioritize the most 'frequently mentioned' entities.
+        - Don’t mix people with organizations or locations.
+
+        Section Listing:
+        - Use short, thematic section names (like “Career Beginnings”, “Major Works”, “Awards”).
+        - Skip boilerplate sections like “See also”, “References”, “External links”.
+
+        Accuracy Guidelines:
+        - If uncertain about a detail, skip it entirely.
+        - Never invent options or add extra entities beyond the article text.
+        - Ensure clean JSON format — no Markdown or commentary.
+
+        Final Note:
+        Be 'factually strict', 'educationally creative', and 'JSON-accurate'.  
+        Focus on 'teaching through questioning', not tricking the learner.  
+        Avoid speculative, unrelated, or vague information.
     """
     )
 

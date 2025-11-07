@@ -1,12 +1,12 @@
 export default function QuizDisplay({ quiz, answers }) {
     if (!quiz) return <p className="p-4 text-gray-600">No quiz data.</p>;
-    console.log(answers)
+    console.log(quiz)
     const checkAns = !!answers;
 
     return (
         <div className="bg-slate-100 min-h-screen p-4">
             <div className="max-w-3xl mx-auto space-y-6">
-                {quiz.quiz?.map((q, idx) => (
+                {quiz?.quiz_data?.quiz.map((q, idx) => (
                     <div
                         key={idx}
                         className="bg-white border border-slate-200 rounded-xl shadow-md p-5 hover:shadow-lg transition"

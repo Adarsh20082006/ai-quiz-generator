@@ -18,19 +18,15 @@
 
 body {
   background-color: rgb(215, 214, 152);
-  color: #333;
+
 }
 
 
 a {
   font-weight: 500;
-  color: #e6e6ed;
   text-decoration: inherit;
 }
 
-a:hover {
-  color: #e7e7ec;
-}
 
 h1 {
   font-size: 3.2em;

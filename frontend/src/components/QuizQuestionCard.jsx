@@ -13,7 +13,7 @@ export default function QuizQuestionCard({ data, onSelect, selected }) {
                         <button
                             key={i}
                             onClick={() => onSelect(opt)}
-                            className={`border rounded p-2 text-left ${active ? "bg-blue-600 text-white" : "hover:bg-gray-50"}`}
+                            className={`border rounded p-2 bg-gray-100 text-left ${active ? "bg-blue-600 text-white" : "hover:bg-gray-200"}`}
                         >
                             {opt}
                         </button>
