@@ -12,28 +12,37 @@ export default function GenerateQuiz() {
     const [quiz, setQuiz] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
     const [error, setError] = useState("");
+    const [fieldErrors, setFieldErrors] = useState({});
     const [checkingStatus, setCheckingStatus] = useState("NOT STARTED"); // NOT STARTED | STARTED | SUCCESS | FAILED
     const navigate = useNavigate();
-
-    // store active timeout so we can cancel it if modal closes
     const pollTimeoutRef = useRef(null);
 
+    // ✅ Validate Wikipedia URL
     const isWikipediaUrl = (url) => {
         try {
             const parsed = new URL(url);
-            return parsed.hostname.includes("wikipedia.org");
+            return parsed.hostname.endsWith("wikipedia.org");
         } catch {
             return false;
         }
     };
 
+    // ✅ Handle URL Preview Validation
     const handlePreview = async () => {
-        if (!isWikipediaUrl(url)) {
-            setError("Please enter a valid Wikipedia URL.");
+        const errors = {};
+        if (!url.trim()) {
+            errors.url = "URL is required.";
+        } else if (!isWikipediaUrl(url)) {
+            errors.url = "Please enter a valid Wikipedia URL.";
+        }
+
+        if (Object.keys(errors).length > 0) {
+            setFieldErrors(errors);
             return;
         }
 
         setError("");
+        setFieldErrors({});
         setLoading(true);
         try {
             const data = await previewArticle(url);
@@ -45,13 +54,31 @@ export default function GenerateQuiz() {
         }
     };
 
+    // ✅ Toggle Section Selection
     const toggleSection = (sec) => {
         setSelectedSections((prev) =>
             prev.includes(sec) ? prev.filter((s) => s !== sec) : [...prev, sec]
         );
     };
 
+    // ✅ Generate Quiz Handler
     const handleGenerate = async () => {
+        const errors = {};
+        if (!url || !isWikipediaUrl(url)) {
+            errors.url = "Invalid or missing Wikipedia URL.";
+        }
+        if (!difficulty) {
+            errors.difficulty = "Please select a difficulty level.";
+        }
+        if (!selectedSections.length) {
+            errors.sections = "Select at least one section to focus on.";
+        }
+
+        if (Object.keys(errors).length > 0) {
+            setFieldErrors(errors);
+            return;
+        }
+
         setLoading(true);
         setModalOpen(true);
         setCheckingStatus("STARTED");
@@ -63,52 +90,27 @@ export default function GenerateQuiz() {
                 sections: selectedSections,
             });
 
-            // ✅ Once quiz generated successfully:
             if (quizData && quizData.id) {
                 setQuiz(quizData);
                 setCheckingStatus("SUCCESS");
-
-                // close modal and go to quiz display immediately
                 setModalOpen(false);
                 navigate(`/quiz/${quizData.id}`, { state: { quiz: quizData } });
                 return;
             }
 
-            // If response didn’t contain quiz data
             setCheckingStatus("FAILED");
-            alert("Something went wrong — no quiz data received.");
+            setError("Something went wrong — no quiz data received.");
             setModalOpen(false);
         } catch (e) {
             setCheckingStatus("FAILED");
-            alert(e?.response?.data?.detail || "Failed to generate quiz");
+            setError(e?.response?.data?.detail || "Failed to generate quiz");
             setModalOpen(false);
         } finally {
             setLoading(false);
         }
     };
 
-    // simple local poll that checks if quiz is set with an id and then navigates.
-    const startLocalPoll = () => {
-        // clear any existing timeout
-        if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);
-
-        const attempt = () => {
-            if (quiz && quiz.id) {
-                // success: close modal and go to detail view
-                setModalOpen(false);
-                setCheckingStatus("NOT STARTED");
-                navigate(`/quiz/${quiz.id}`, { state: { quiz } });
-                return;
-            }
-            // retry shortly (kept small for snappy UX; adjust if you like)
-            pollTimeoutRef.current = setTimeout(attempt, 300);
-        };
-
-        // kick off first attempt after a tiny delay (gives React time to set state)
-        pollTimeoutRef.current = setTimeout(attempt, 200);
-    };
-
-    // clear timeout if component unmounts
+    // ✅ Cleanup polling
     useEffect(() => {
         return () => {
             if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);
@@ -117,7 +119,6 @@ export default function GenerateQuiz() {
 
     return (
         <div className="min-h-screen p-4 max-w-2xl mx-auto">
-            {/* Header */}
             <div className="flex items-center justify-between mb-5">
                 <h2 className="text-2xl font-bold text-slate-900">Generate Quiz</h2>
                 <button
@@ -131,16 +132,14 @@ export default function GenerateQuiz() {
             <div className="bg-yellow-100 border border-yellow-300 rounded-xl p-4 shadow">
                 <label className="text-sm font-medium">Wikipedia URL</label>
                 <input
-                    className="w-full border border-slate-300 rounded p-2 mt-1 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    className={`w-full border rounded p-2 mt-1 focus:ring-2 focus:ring-blue-400 focus:outline-none ${fieldErrors.url ? "border-red-500" : "border-slate-300"}`}
                     placeholder="https://en.wikipedia.org/wiki/Alan_Turing"
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     readOnly={!!preview}
                 />
-                {error && (
-                    <p className="text-red-600 text-sm mt-2 font-medium animate-fadeIn">
-                        {error}
-                    </p>
+                {fieldErrors.url && (
+                    <p className="text-red-600 text-sm mt-1">{fieldErrors.url}</p>
                 )}
 
                 {!preview && (
@@ -163,7 +162,7 @@ export default function GenerateQuiz() {
                         <div className="mt-4">
                             <label className="text-sm font-medium">Difficulty</label>
                             <select
-                                className="w-full border rounded p-2 mt-1 bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                                className={`w-full border rounded p-2 mt-1 bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none ${fieldErrors.difficulty ? "border-red-500" : "border-slate-300"}`}
                                 value={difficulty}
                                 onChange={(e) => setDifficulty(e.target.value)}
                                 readOnly={!!quiz}
@@ -172,6 +171,9 @@ export default function GenerateQuiz() {
                                 <option>Medium</option>
                                 <option>Hard</option>
                             </select>
+                            {fieldErrors.difficulty && (
+                                <p className="text-red-600 text-sm mt-1">{fieldErrors.difficulty}</p>
+                            )}
                         </div>
 
                         <div className="mt-4">
@@ -190,6 +192,9 @@ export default function GenerateQuiz() {
                                     </button>
                                 ))}
                             </div>
+                            {fieldErrors.sections && (
+                                <p className="text-red-600 text-sm mt-1">{fieldErrors.sections}</p>
+                            )}
                         </div>
 
                         <button
@@ -203,11 +208,10 @@ export default function GenerateQuiz() {
                 )}
             </div>
 
-            {/* Modal: summary while generating; closes automatically on success */}
+            {/* Modal */}
             <Modal
                 isOpen={modalOpen}
                 onClose={() => {
-                    // user wants to stop waiting; close modal and clear any timer
                     if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);
                     setModalOpen(false);
                 }}
@@ -221,25 +225,40 @@ export default function GenerateQuiz() {
             >
                 {checkingStatus === "STARTED" ? (
                     <div className="space-y-4">
+                        {/* Heading */}
                         <h3 className="text-lg font-semibold text-slate-800">
-                            Take a moment to revise before your quiz!
+                            Key Points to Revise Before Your Quiz
                         </h3>
-                        {preview?.summary ? (
-                            <p className="text-sm text-slate-600 leading-relaxed bg-slate-100 border border-slate-200 rounded-lg p-3">
-                                {preview.summary}
-                            </p>
+
+                        {/* Summary Points List */}
+                        {preview?.summary_points?.length ? (
+                            <ul className="text-sm bg-slate-100 border border-slate-200 rounded-lg p-4 space-y-2 text-slate-700 max-h-72 overflow-y-auto shadow-inner">
+                                {preview.summary_points.map((pt, i) => (
+                                    <li
+                                        key={i}
+                                        className="flex items-start gap-3 leading-relaxed hover:bg-slate-200/60 rounded-lg p-1 transition"
+                                    >
+                                        <span className="text-blue-600 font-bold min-w-[20px]">
+                                            {i + 1}.
+                                        </span>
+                                        <span className="text-slate-800">{pt}</span>
+                                    </li>
+                                ))}
+                            </ul>
                         ) : (
                             <p className="text-sm text-slate-600 leading-relaxed bg-slate-100 border border-slate-200 rounded-lg p-3">
                                 {preview?.available_sections?.length
-                                    ? `This article covers: ${preview.available_sections
+                                    ? `Analyzing sections: ${preview.available_sections
                                         .slice(0, 3)
                                         .join(", ")} and more...`
-                                    : "Analyzing key sections of the Wikipedia article..."}
+                                    : "Extracting key insights from the article..."}
                             </p>
                         )}
-                        <div className="flex items-center space-x-3 text-sm text-slate-500">
+
+                        {/* Loader */}
+                        <div className="flex items-center space-x-3 text-sm text-slate-500 mt-4">
                             <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                            <p>Generating questions, please wait...</p>
+                            <p>Generating quiz questions — please wait...</p>
                         </div>
                     </div>
                 ) : checkingStatus === "FAILED" ? (
@@ -248,6 +267,7 @@ export default function GenerateQuiz() {
                     </p>
                 ) : null}
             </Modal>
+
         </div>
     );
 }

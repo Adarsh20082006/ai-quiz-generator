@@ -10,10 +10,12 @@ from vector_service import build_faiss_index
 load_dotenv()
 parser = PydanticOutputParser(pydantic_object=QuizOutput)
 model = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
+    model="models/gemini-2.5-flash",
     google_api_key=os.getenv("GEMINI_API_KEY"),
     temperature=0.5
 )
+
+
 
 def generate_quiz(article_title: str, structured_content: dict, difficulty="Medium", selected_sections=None):
     sections = structured_content.get("sections", [])

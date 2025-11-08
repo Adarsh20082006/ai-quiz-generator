@@ -27,12 +27,12 @@ class QuizRequest(BaseModel):
     sections: list[str] | None = None
 
 @app.post("/generate_quiz",description='Getting data from wikipedia',tags=['Quiz'])
-def preview_article(payload: URLPreview):
+async def preview_article(payload: URLPreview):
     try:
         scraped = get_or_create_scraped_data(str(payload.url))
         sections = [s["heading"] for s in scraped["sections"]]
-        print(f"Got {scraped['title']} data!")
-        return {"status":True,"title": scraped["title"], "available_sections": sections}
+        print(f"Got {scraped['title']}'s data!")
+        return {"status":True,"title": scraped["title"], "available_sections": sections,"summary_points":scraped.get("summary_points", [])}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
