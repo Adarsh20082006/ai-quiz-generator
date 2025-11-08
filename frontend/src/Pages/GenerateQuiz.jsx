@@ -30,7 +30,7 @@ export default function GenerateQuiz() {
     // ✅ Handle URL Preview Validation
     const handlePreview = async () => {
         const errors = {};
-        if (!url.trim()) {
+        if (!url.trim() || url == "") {
             errors.url = "URL is required.";
         } else if (!isWikipediaUrl(url)) {
             errors.url = "Please enter a valid Wikipedia URL.";
@@ -123,13 +123,13 @@ export default function GenerateQuiz() {
                 <h2 className="text-2xl font-bold text-slate-900">Generate Quiz</h2>
                 <button
                     onClick={() => navigate("/")}
-                    className="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg shadow transition"
+                    className="bg-slate-700 border-slate-600 hover:bg-slate-600 text-slate-100 px-4 py-2 rounded-lg shadow transition"
                 >
                     Back to Dashboard
                 </button>
             </div>
 
-            <div className="bg-yellow-100 border border-yellow-300 rounded-xl p-4 shadow">
+            <div className="bg-slate-800 border rounded-xl p-4 shadow">
                 <label className="text-sm font-medium">Wikipedia URL</label>
                 <input
                     className={`w-full border rounded p-2 mt-1 focus:ring-2 focus:ring-blue-400 focus:outline-none ${fieldErrors.url ? "border-red-500" : "border-slate-300"}`}
@@ -145,7 +145,7 @@ export default function GenerateQuiz() {
                 {!preview && (
                     <button
                         onClick={handlePreview}
-                        className="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                        className="mt-3 bg-blue-500 text-white px-4 border-blue-500 py-2 rounded hover:bg-blue-600 transition"
                         disabled={loading || !url}
                     >
                         {loading ? "Checking..." : "Validate & Preview"}
@@ -155,14 +155,14 @@ export default function GenerateQuiz() {
                 {preview && (
                     <>
                         <div className="mt-4">
-                            <p className="text-sm">Title:</p>
-                            <h3 className="font-semibold text-slate-800">{preview.title}</h3>
+                            <span className="text-shadow-md">Title: </span>
+                            <span className="font-bold text-xl text-yellow-400 ">{preview.title}</span>
                         </div>
 
                         <div className="mt-4">
-                            <label className="text-sm font-medium">Difficulty</label>
+                            <label className="text-shadow-md font-medium">Difficulty</label>
                             <select
-                                className={`w-full border rounded p-2 mt-1 bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none ${fieldErrors.difficulty ? "border-red-500" : "border-slate-300"}`}
+                                className={`w-full border rounded p-2 mt-1 bg-slate-800 focus:ring-2 focus:ring-blue-400 focus:outline-none ${fieldErrors.difficulty ? "border-red-500" : "border-slate-300"}`}
                                 value={difficulty}
                                 onChange={(e) => setDifficulty(e.target.value)}
                                 readOnly={!!quiz}
@@ -183,9 +183,9 @@ export default function GenerateQuiz() {
                                     <button
                                         key={i}
                                         onClick={() => toggleSection(sec)}
-                                        className={`text-sm border rounded px-2 py-1 transition ${selectedSections.includes(sec)
-                                            ? "text-cyan-300 border-blue-200 bg-gray-800"
-                                            : "bg-gray-800 text-white"
+                                        className={`text-sm  rounded px-2 py-1 border-slate-50 transition ${selectedSections.includes(sec)
+                                            ? "text-yellow-400 border-yellow-300"
+                                            : ""
                                             }`}
                                     >
                                         {sec}
@@ -199,7 +199,7 @@ export default function GenerateQuiz() {
 
                         <button
                             onClick={handleGenerate}
-                            className="mt-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
+                            className="mt-4 bg-emerald-500 border-transparent hover:bg-emerald-600 text-white px-4 py-2 rounded transition"
                             disabled={loading}
                         >
                             {loading ? "Generating..." : "Submit & Generate Quiz"}
@@ -222,31 +222,32 @@ export default function GenerateQuiz() {
                             ? "Something went wrong"
                             : "Preparing Article Summary..."
                 }
+                className="bg-slate-900 text-slate-100 border border-slate-700 shadow-2xl rounded-xl"
             >
                 {checkingStatus === "STARTED" ? (
                     <div className="space-y-4">
                         {/* Heading */}
-                        <h3 className="text-lg font-semibold text-slate-800">
+                        <h3 className="text-lg font-semibold text-emerald-400">
                             Key Points to Revise Before Your Quiz
                         </h3>
 
                         {/* Summary Points List */}
                         {preview?.summary_points?.length ? (
-                            <ul className="text-sm bg-slate-100 border border-slate-200 rounded-lg p-4 space-y-2 text-slate-700 max-h-72 overflow-y-auto shadow-inner">
+                            <ul className="text-sm bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-2 text-slate-100 max-h-72 overflow-y-auto shadow-inner">
                                 {preview.summary_points.map((pt, i) => (
                                     <li
                                         key={i}
-                                        className="flex items-start gap-3 leading-relaxed hover:bg-slate-200/60 rounded-lg p-1 transition"
+                                        className="flex items-start gap-3 leading-relaxed hover:bg-slate-700/70 rounded-lg p-2 transition"
                                     >
-                                        <span className="text-blue-600 font-bold min-w-[20px]">
+                                        <span className="text-emerald-400 font-bold min-w-[20px]">
                                             {i + 1}.
                                         </span>
-                                        <span className="text-slate-800">{pt}</span>
+                                        <span className="text-slate-200">{pt}</span>
                                     </li>
                                 ))}
                             </ul>
                         ) : (
-                            <p className="text-sm text-slate-600 leading-relaxed bg-slate-100 border border-slate-200 rounded-lg p-3">
+                            <p className="text-sm text-slate-300 leading-relaxed bg-slate-800 border border-slate-700 rounded-lg p-4">
                                 {preview?.available_sections?.length
                                     ? `Analyzing sections: ${preview.available_sections
                                         .slice(0, 3)
@@ -256,17 +257,18 @@ export default function GenerateQuiz() {
                         )}
 
                         {/* Loader */}
-                        <div className="flex items-center space-x-3 text-sm text-slate-500 mt-4">
-                            <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="flex items-center space-x-3 text-sm text-slate-400 mt-4">
+                            <div className="w-5 h-5 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
                             <p>Generating quiz questions — please wait...</p>
                         </div>
                     </div>
                 ) : checkingStatus === "FAILED" ? (
-                    <p className="text-sm text-red-600">
+                    <p className="text-sm text-red-400 font-medium">
                         Failed to generate quiz. Please close and try again.
                     </p>
                 ) : null}
             </Modal>
+
 
         </div>
     );

@@ -1,29 +1,29 @@
 export default function QuizDisplay({ quiz, answers }) {
     if (!quiz) return <p className="p-4 text-gray-600">No quiz data.</p>;
-    console.log(quiz)
+    console.log(quiz);
     const checkAns = !!answers;
 
     return (
-        <div className="bg-slate-100 min-h-screen p-4">
+        <div className="bg-[#1e293b] rounded-2xl min-h-screen p-4">
             <div className="max-w-3xl mx-auto space-y-6">
                 {quiz?.quiz_data?.quiz.map((q, idx) => (
                     <div
                         key={idx}
-                        className="bg-white border border-slate-200 rounded-xl shadow-md p-5 hover:shadow-lg transition"
+                        className="bg-slate-700 border border-slate-800 rounded-xl shadow-md p-5 hover:shadow-lg transition"
                     >
                         {/* Question Header */}
                         <div className="flex justify-between items-start mb-2">
-                            <h3 className="font-semibold text-lg text-slate-900">
+                            <h3 className="font-semibold text-lg text-slate-200">
                                 {idx + 1}. {q.question}
                             </h3>
 
                             {/* Difficulty Badge */}
                             <span
                                 className={`text-xs font-semibold px-2 py-1 rounded-full ${q.difficulty === "hard"
-                                    ? "bg-red-100 text-red-700"
+                                    ? "bg-red-500 text-slate-50"
                                     : q.difficulty === "medium"
-                                        ? "bg-yellow-100 text-yellow-700"
-                                        : "bg-green-100 text-green-700"
+                                        ? "bg-orange-400 text-slate-50"
+                                        : "bg-emerald-600 text-slate-50"
                                     }`}
                             >
                                 {q.difficulty}
@@ -36,13 +36,12 @@ export default function QuizDisplay({ quiz, answers }) {
                                 const isCorrect = q.answer === opt;
                                 const isSelected = checkAns && answers[idx] === opt;
 
-                                const correctClass =
-                                    isCorrect
-                                        ? "bg-green-200 border-green-400"
-                                        : "";
+                                const correctClass = isCorrect
+                                    ? "bg-emerald-600 border-green-400"
+                                    : "";
                                 const wrongClass =
                                     checkAns && isSelected && !isCorrect
-                                        ? "bg-red-200 border-red-400"
+                                        ? "bg-red-500 border-red-400"
                                         : "";
 
                                 return (
@@ -58,10 +57,15 @@ export default function QuizDisplay({ quiz, answers }) {
                         </ul>
 
                         {/* Correct Answer & Explanation */}
-                        <p className="mt-3 text-sm text-green-700 font-medium">
+                        <p className="mt-3 text-sm text-emerald-500 font-medium">
                             ✅ Correct: {q.answer}
                         </p>
-                        <p className="text-xs text-slate-600 mt-1">{q.explanation}</p>
+                        <p className="text-xs text-slate-50 mt-1">{q.explanation}</p>
+
+                        {/* ✅ Related Topics */}
+                        <p className="mt-3 text-sm text-slate-200 font-medium">
+                            Related Topic : {q.section}
+                        </p>
                     </div>
                 ))}
             </div>

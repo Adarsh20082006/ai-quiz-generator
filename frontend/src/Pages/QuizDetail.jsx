@@ -24,14 +24,14 @@ export default function QuizDetail() {
                 <h2 className="text-2xl font-bold">Quiz</h2>
                 <div className="flex gap-2">
                     <button
-                        className="bg-green-600 text-white px-3 py-1 rounded"
+                        className="bg-emerald-500 border-transparent hover:bg-emerald-600 text-white px-3 py-1 rounded"
                         onClick={() => navigate("/take_quiz", { state: { quiz } })}
                         disabled={!quiz}
                     >
                         Take Quiz
                     </button>
                     <button
-                        className="bg-gray-900 text-white px-3 py-1 rounded"
+                        className="bg-slate-700 border-transparent hover:bg-slate-600 text-slate-100 px-4 py-2 rounded-lg shadow transition"
                         onClick={() => navigate("/")}
                     >
                         Dashboard

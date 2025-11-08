@@ -42,10 +42,10 @@ export default function TakeQuiz() {
     };
 
     return (
-        <div className="min-h-screen p-4 max-w-2xl mx-auto">
-            <div className="flex items-center justify-between mb-3">
-                <h2 className="text-xl font-bold text-slate-900">Take Quiz</h2>
-                <span className="text-sm text-gray-600">
+        <div className="min-h-screen  p-4 max-w-2xl mx-auto">
+            <div className="flex  items-center justify-between mb-3">
+                <h2 className="text-xl font-bold text-slate-50">Take Quiz</h2>
+                <span className="text-sm text-gray-300">
                     {idx + 1} / {questions.length}
                 </span>
             </div>

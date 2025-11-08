@@ -16,16 +16,16 @@ export default function History() {
                 <h2 className="text-2xl font-bold text-slate-900">Quiz History</h2>
                 <button
                     onClick={() => navigate("/")}
-                    className="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg shadow transition"
+                    className="bg-slate-700 hover:bg-slate-600 text-slate-100 px-4 py-2 rounded-lg shadow transition"
                 >
                     Back to Dashboard
                 </button>
             </div>
 
             {/* Table container */}
-            <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-x-auto">
+            <div className="bg-slate-800 rounded-xl shadow-md border overflow-x-auto">
                 <table className="min-w-full text-sm">
-                    <thead className="bg-slate-100 text-slate-700 uppercase text-xs font-semibold">
+                    <thead className="bg-slate-700 text-slate-50 uppercase text-xs font-semibold">
                         <tr>
                             <th className="p-3 text-left">ID</th>
                             <th className="p-3 text-left">Title</th>
@@ -40,10 +40,10 @@ export default function History() {
                             rows.map((r) => (
                                 <tr
                                     key={r.id}
-                                    className="border-t hover:bg-slate-50 transition-colors"
+                                    className="border-t hover:bg-slate-700 transition-colors"
                                 >
-                                    <td className="p-3 font-medium text-slate-800">{r.id}</td>
-                                    <td className="p-3 text-slate-700">{r.title}</td>
+                                    <td className="p-3 font-medium text-slate-50">{r.id}</td>
+                                    <td className="p-3 text-slate-50">{r.title}</td>
                                     <td className="p-3 max-w-[220px] truncate text-blue-400 hover:underline">
                                         <a
                                             href={r.url}
@@ -53,13 +53,13 @@ export default function History() {
                                             {r.url}
                                         </a>
                                     </td>
-                                    <td className="p-3 text-slate-600">
+                                    <td className="p-3 text-slate-200">
                                         {new Date(r.date_generated).toLocaleString()}
                                     </td>
                                     <td className="p-3">
                                         <Link
                                             to={`/quiz/${r.id}`}
-                                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md shadow-sm transition"
+                                            className="bg-blue-600 hover:bg-blue-700 text-slate-200 px-3 py-1.5 rounded-md shadow-sm transition"
                                         >
                                             Details
                                         </Link>

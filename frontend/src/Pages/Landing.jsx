@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 export default function Landing() {
     return (
         <div className="min-h-screen   flex flex-col items-center justify-center text-center px-4">
-            <h1 className="text-4xl font-extrabold text-slate-900 mb-2">AI Wiki Quiz Generator</h1>
-            <p className="text-slate-600 max-w-md mb-8">
+            <h1 className="text-4xl font-extrabold text-yellow-400 mb-2">AI Wiki Quiz Generator</h1>
+            <p className="text-slate-50 max-w-md mb-8">
                 Learn interactively from Wikipedia using AI-powered quizzes. Select a topic, test yourself, and track your learning.
             </p>
 

@@ -17,7 +17,8 @@
 }
 
 body {
-  background-color: rgb(215, 214, 152);
+  background-color: #0f172a;
+  color: #f8fafc;
 
 }
 
@@ -35,7 +36,7 @@ h1 {
 
 button {
   border-radius: 8px;
-  border: 1px solid transparent;
+  border-width: 1px;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;

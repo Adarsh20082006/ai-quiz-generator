@@ -21,15 +21,16 @@ export default function Scorecard() {
     // View submission toggle
     if (viewSubmission) {
         return (
-            <div className="min-h-screen bg-slate-50 p-4">
-                <div className="max-w-3xl mx-auto">
+            <div className="min-h-screen bg-slate-800 p-4">
+                <div className="max-w-3xl mx-auto ">
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-2xl font-bold text-slate-800">
+                        <h2 className="text-2xl font-bold text-slate-50">
                             Your Submission Review
                         </h2>
                         <button
                             onClick={() => setViewSubmission(false)}
-                            className="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg shadow-sm"
+                            className="bg-slate-700 hover:bg-slate-600 border-transparent
+border-transparent text-slate-100 px-4 py-2 rounded-lg shadow transition"
                         >
                             Back to Score
                         </button>
@@ -43,23 +44,23 @@ export default function Scorecard() {
     // Score summary view
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-6">
-            <div className="bg-yellow-100 rounded-xl shadow-lg border border-slate-200 w-full max-w-md p-6 text-center">
-                <h2 className="text-3xl font-bold text-slate-800 mb-2">Your Score</h2>
-                <p className="text-4xl font-extrabold text-blue-600">
+            <div className="bg-slate-600 rounded-xl shadow-lg border border-slate-800 w-full max-w-md p-6 text-center">
+                <h2 className="text-3xl font-bold text-slate-50 mb-2">Your Score</h2>
+                <p className="text-4xl font-extrabold text-yellow-400">
                     {score} / {total}
                 </p>
-                <p className="text-slate-600 mt-2 text-lg">{getMessage()}</p>
+                <p className="text-slate-200 mt-2 text-lg">{getMessage()}</p>
 
                 <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
                     <button
                         onClick={() => setViewSubmission(true)}
-                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow-sm"
+                        className="bg-emerald-500 hover:bg-emerald-600 border-transparent text-white px-4 py-2 rounded-lg shadow-sm"
                     >
                         View Submission
                     </button>
                     <button
                         onClick={() => navigate("/")}
-                        className="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg shadow-sm"
+                        className="bg-slate-800 hover:bg-slate-900 border-transparent text-white px-4 py-2 rounded-lg shadow-sm"
                     >
                         Back to Dashboard
                     </button>
