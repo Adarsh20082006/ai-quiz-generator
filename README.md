@@ -199,6 +199,15 @@ docker exec -it <mysql_container_id> mysql -u root -p
 ├── docker-compose.yml
 └── README.md
 ```
+
+## Bonus Points
+
+- "Take Quiz" mode with user scoring.
+- URL validation and preview (auto-fetch article title before processing).
+- Store scraped raw HTML in database for reference.
+- Caching to prevent duplicate scraping of the same URL.
+- Section-wise question grouping in UI.
+
 ## ❓ Troubleshooting
 Issue	Cause	Fix
 Frontend not loading	Vite not listening on 0.0.0.0	Update Dockerfile to expose host
