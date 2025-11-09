@@ -20,7 +20,7 @@ A full-stack AI-powered application that scrapes Wikipedia articles and generate
 ### 1. Clone and Set Up
 ```bash
 git clone https://github.com/yourusername/ai-quiz-generator.git
-cd ai-quiz-generator
+cd ai-quiz-generator  
 ```
 
 
