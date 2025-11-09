@@ -107,43 +107,134 @@ flowchart TD
 #### Output JSON Format
 ```json
 {
-  "id": 1,
-  "url": "[https://en.wikipedia.org/wiki/Alan_Turing](https://en.wikipedia.org/wiki/Alan_Turing)",
-  "title": "Alan Turing",
-  "summary": "Alan Turing was a British mathematician and computer scientist...",
+  "id": 7,
+  "url": "https://en.wikipedia.org/wiki/Defence_Research_and_Development_Organisation",
+  "title": "Defence Research and Development Organisation",
+  "summary": "The Defence Research and Development Organisation (DRDO) was established in 1958 by combining the Defence Science Organisation and technical development establishments. It has been instrumental in developing a comprehensive range of defence technologies, from missiles to aircraft avionics and artillery systems. DRDO is currently undergoing reforms and shifting its focus towards next-generation technologies while increasing collaboration with the private sector for conventional systems.",
   "key_entities": {
-    "people": ["Alan Turing", "Alonzo Church"],
-    "organizations": ["University of Cambridge", "Bletchley Park"],
-    "locations": ["United Kingdom"]
+    "people": [
+      "A. K. Antony",
+      "K. Vijayraghavan",
+      "Dr. B.K. Das"
+    ],
+    "organizations": [
+      "DRDO",
+      "Indian Ministry of Defence",
+      "Indian Armed Forces",
+      "Defence Technology Commission",
+      "Hindustan Aeronautics Limited",
+      "ISRO",
+      "FICCI"
+    ],
+    "locations": [
+      "Odisha coast",
+      "Hyderabad",
+      "Lucknow",
+      "Goa",
+      "Mumbai",
+      "Chandigarh",
+      "Kolkata"
+    ]
   },
-  "sections": ["Early life", "World War II", "Legacy"],
+  "sections": ["Defence", "Space", "Technology"],
   "quiz": [
     {
-      "question": "Where did Alan Turing study?",
+      "question": "When was the Defence Research and Development Organisation (DRDO) established?",
       "options": [
-        "Harvard University",
-        "Cambridge University",
-        "Oxford University",
-        "Princeton University"
+        "1980",
+        "2007",
+        "1958",
+        "2010"
       ],
-      "answer": "Cambridge University",
+      "answer": "1958",
       "difficulty": "easy",
-      "explanation": "Mentioned in the 'Early life' section."
+      "explanation": "The DRDO was established in 1958 by combining the Defence Science Organisation and some of the technical development establishments."
     },
     {
-      "question": "What was Alan Turing's main contribution during World War II?",
+      "question": "What years did the Integrated Guided Missile Development Programme (IGMDP) run as an Indian Ministry of Defence programme?",
       "options": [
-        "Atomic research",
-        "Breaking the Enigma code",
-        "Inventing radar",
-        "Developing jet engines"
+        "1970s to 1980s",
+        "Early 1980s to 2007",
+        "2007 to 2010",
+        "2010 to 2024"
       ],
-      "answer": "Breaking the Enigma code",
+      "answer": "Early 1980s to 2007",
+      "difficulty": "easy",
+      "explanation": "IGMDP was an Indian Ministry of Defence programme between the early 1980s and 2007."
+    },
+    {
+      "question": "Who was the defence minister who ordered the restructuring of the DRDO in 2010?",
+      "options": [
+        "K. Vijayraghavan",
+        "Dr. B.K. Das",
+        "A. K. Antony",
+        "Manastu Space Technologies"
+      ],
+      "answer": "A. K. Antony",
+      "difficulty": "easy",
+      "explanation": "In 2010, the defence minister A. K. Antony ordered the restructuring of the DRDO."
+    },
+    {
+      "question": "In what year did DRDO test India's first long-range hypersonic missile?",
+      "options": [
+        "2007",
+        "2010",
+        "2024",
+        "2025"
+      ],
+      "answer": "2024",
+      "difficulty": "easy",
+      "explanation": "In 2024, DRDO tested India's first long-range hypersonic missile."
+    },
+    {
+      "question": "Where was the maiden flight test of the Integrated Air Defence Weapon System (IADWS) conducted on August 23, 2025?",
+      "options": [
+        "Off the Goa coast",
+        "Off the Mumbai coast",
+        "Off the Odisha coast",
+        "Off the Chennai coast"
+      ],
+      "answer": "Off the Odisha coast",
+      "difficulty": "easy",
+      "explanation": "On August 23, 2025, DRDO successfully conducted the maiden flight test of the Integrated Air Defence Weapon System (IADWS) off the Odisha coast."
+    },
+    {
+      "question": "Which organization administers the Technology Development Fund (TDF) Scheme?",
+      "options": [
+        "Indian Ministry of Defence",
+        "DRDO",
+        "IIT Bombay",
+        "Manastu Space Technologies"
+      ],
+      "answer": "DRDO",
+      "difficulty": "easy",
+      "explanation": "The Technology Development Fund (TDF) Scheme is a Ministry of Defence programme administered by the DRDO."
+    },
+    {
+      "question": "What is a key measure identified to make DRDO effective in its functioning, as per the text?",
+      "options": [
+        "Merging with ISRO",
+        "Establishing a Defence Technology Commission with the defence minister as chairman",
+        "Relocating all labs to Hyderabad",
+        "Focusing solely on conventional weapons"
+      ],
+      "answer": "Establishing a Defence Technology Commission with the defence minister as chairman",
       "difficulty": "medium",
-      "explanation": "Detailed in the 'World War II' section."
+      "explanation": "The key measures to make DRDO effective in its functioning include the establishment of a Defence Technology Commission with the defence minister as its chairman."
+    },
+    {
+      "question": "What is the primary shift in focus for DRDO under its new strategy, DRDO 2.0?",
+      "options": [
+        "From next-generation technologies to conventional weapons",
+        "From conventional weapons to civilian applications",
+        "From conventional weapons to next-generation technologies",
+        "From private sector collaboration to in-house development"
+      ],
+      "answer": "From conventional weapons to next-generation technologies",
+      "difficulty": "medium",
+      "explanation": "Under the new strategy known as DRDO 2.0, DRDO is shifting its focus from the development of conventional weapons to next-generation technologies like directed energy weapons, photonics, quantum systems, and artificial intelligence."
     }
-  ],
-  "related_topics": ["Cryptography", "Enigma machine", "Computer science history"]
+  ]
 }
 
 ```
