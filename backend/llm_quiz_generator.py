@@ -6,111 +6,158 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from models import QuizOutput
 from vector_service import build_faiss_index
+from langchain_core.runnables import RunnableSequence
 
 load_dotenv()
+
+# Initialize Output Parser
 parser = PydanticOutputParser(pydantic_object=QuizOutput)
+api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+# Initialize Gemini Model (Stable, Fast)
 model = ChatGoogleGenerativeAI(
     model="models/gemini-2.5-flash",
-    google_api_key=os.getenv("GEMINI_API_KEY"),
+    google_api_key=api_key,
     temperature=0.5
 )
 
-
-
 def generate_quiz(article_title: str, structured_content: dict, difficulty="Medium", selected_sections=None):
+    """Generate a factual, structured quiz from Wikipedia article content."""
+    
+    # Step 1: Extract relevant sections
     sections = structured_content.get("sections", [])
     if selected_sections:
-        sections = [s for s in sections if s["heading"] in selected_sections ]
+        sections = [s for s in sections if s["heading"] in selected_sections]
 
+    # Step 2: Merge content from sections + subsections
     article_text = "\n".join(
         (s.get("content", "")) + " " + " ".join(sub.get("content", "") for sub in s.get("subsections", []))
         for s in sections
     )
 
+    # Building FAISS index for semantic relevance
     vector_store, _ = build_faiss_index(article_text)
     query = f"important facts, achievements, and insights about {article_title}"
     retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 10})
-    docs = retriever.invoke(query)  # Correct method for LangChain v0.3+
-
+    docs = retriever.invoke(query)
     relevant_text = "\n".join([d.page_content for d in docs])
 
+    # Creating the prompt
     prompt = PromptTemplate(
-        input_variables=["title", "content"],
+        input_variables=["title", "content", "difficulty"],
         partial_variables={
             "format_instructions": parser.get_format_instructions()
         },
-        template="""   
-        You are an expert educational quiz generator. Your goal is to create a JSON-formatted quiz strictly based on the given Wikipedia article content — ensuring factual accuracy, coverage diversity, and teaching effectiveness.
+        template="""
 
-        'Article Title:' {title}  
-        'Article Content:' 
-        {content}  
+        You are an expert Educational Content Designer and a meticulous Fact-Checker.
+        Your *sole* purpose is to transform a provided source text into a high-quality, structured JSON quiz.
+        Your primary directive is 100% factual accuracy and strict, unwavering adherence to the provided source text.
 
+        <Article Title>
+        {title}
+        </Article Title>
+
+        <SOURCE_TEXT>
+        {content}
+        </SOURCE_TEXT>
+
+        <JSON_SCHEMA>
         {format_instructions}
+        </JSON_SCHEMA>
 
-        Follow all the instructions carefully.
+        <CONFIG>
+        Difficulty Mode: {difficulty}
+        </CONFIG>
 
-        Primary Objectives:
-        - Transform the article into a 'rich, structured quiz dataset'.
-        - Ensure every question, summary point, and entity is 'fully grounded in the provided text'.
-        - Never include hallucinated, assumed, or guessed information.
-        - Maintain educational value by making each question teach something meaningful.
+        <CORE_PRINCIPLES>
+        1.  **Zero-Knowledge Mandate:** You MUST assume you have ZERO knowledge of the world, history, or any facts *outside* the provided `<SOURCE_TEXT>`.
+        2.  **Strict Grounding:** Every single piece of generated output (question, answer, explanation, entity) MUST be 100% derivable *directly* from the `<SOURCE_TEXT>`.
+        3.  **No Inference:** You MUST NOT infer, guess, or create logical connections between facts that are not *explicitly stated* in the text. If the text mentions "Fact A" and "Fact B" separately, you cannot create a question that implies a relationship "Fact C" unless that relationship is *also* explicitly stated.
+        4.  **No Hallucination:** If a piece of information cannot be generated with 100% confidence from the text, you MUST omit it. If the source text is insufficient to generate the required number of questions, you MUST stop and output a simple JSON error message: "error": "Source text is insufficient to generate a high-quality quiz that meets all constraints."
+        5.  **Schema Adherence:** You MUST adhere *perfectly* to the provided <JSON_SCHEMA>. The output MUST be a single, clean JSON object with no explanatory text, markdown, or commentary before or after it.
+        </CORE_PRINCIPLES>
 
-        Additional Rules & Guidelines
+        <TASK_DEFINITION>
+        You will receive a `<SOURCE_TEXT>`, an `<ARTICLE_TITLE>`, a `{difficulty}` ("Easy", "Medium", or "Hard"), and `<JSON_SCHEMA>`.
+        Your task is to populate the <JSON_SCHEMA> based *only* on the `<SOURCE_TEXT>`.
+        </TASK_DEFINITION>
 
-        Question Generation:
-        - Create '8 questions' from the article.
-        - Ensure a 'good balance' of direct recall and reasoning questions.
-        - Each question should test 'understanding' — not just memory.
-        - Avoid repeating similar facts or rephrasing existing questions.
+        <MODULE_INSTRUCTIONS>
 
-        Difficulty Distribution:
-        Use these ratios for each mode:
-        - Easy mode → 70% easy, 20% medium, 10% hard  
-        - Medium mode → 25% easy, 60% medium, 15% hard  
-        - Hard mode → 10% easy, 30% medium, 60% hard  
+        ### 1. Summary Module (`summary`)
+        - Generate a 2-3 sentence summary.
+        - This summary MUST identify the central thesis, person, or event of the article.
+        - It MUST state the *most significant attribute or accomplishment* as described in the text.
+        - You MUST avoid generic definitions; focus on *what makes this topic notable* according to the text.
 
-        > “Easy” = direct factual (who/what/when/where)  
-        > “Medium” = contextual (why/how/simple reasoning)  
-        > “Hard” = analytical, indirect, or critical facts.
+        ### 2. Sections Module (`main_sections`)
+        - Extract the primary thematic section titles from the article.
+        - You MUST *NEVER* include non-content, boilerplate sections (e.g., "See also", "References", "External links", "Contents", "Further reading").
+        - If no thematic sections are present, output an empty list ``.
 
-        Explanation Rules:
-        - Each explanation should be concise and crisp.
-        - Should clarify why the answer is correct.
-        - Avoid vague wording like “as per the article” — don't specific like this, Just give response by considering all the data is valid.
+        ### 3. Entities Module (`key_entities`)
+        - Scan the `<SOURCE_TEXT>` and extract the *most central and most repeated* named entities.
+        - Limit the lists to a maximum of 7 entities per category.
+        - All entities MUST be explicitly named in the text.
+        - If no entities are found for a category, you MUST output an empty list ``.
 
-        Summary Rules:
-        - The summary should not be generic — it should feel **tailored** to the topic.
+        ### 4. Quiz Module (`questions` array)
+        - You MUST generate *exactly 8* multiple-choice questions.
+        - The difficulty distribution is NOT flexible and is determined by the {difficulty} input.
 
-        Key Entity Extraction:
-        - Extract only 'explicit mentions' — not inferred connections.
-        - Prioritize the most 'frequently mentioned' entities.
-        - Don’t mix people with organizations or locations.
+        <DIFFICULTY_LOGIC>
+        - **IF {difficulty} == "Easy":**
+        - Generate **6 "Easy"** questions.
+        - Generate **2 "Medium"** questions.
+        - Generate **0 "Hard"** questions.
+        - **IF {difficulty} == "Medium":**
+        - Generate **2 "Easy"** questions.
+        - Generate **5 "Medium"** questions.
+        - Generate **1 "Hard"** question.
+        - **IF {difficulty} == "Hard":**
+        - Generate **1 "Easy"** question.
+        - Generate **2 "Medium"** questions.
+        - Generate **5 "Hard"** questions.
+        </DIFFICULTY_LOGIC>
 
-        Section Listing:
-        - Use short, thematic section names (like “Career Beginnings”, “Major Works”, “Awards”).
-        - Skip boilerplate sections like “See also”, “References”, “External links”.
+        <DIFFICULTY_DEFINITIONS>
+        - **"Easy" (Factual Recall):** Tests *who, what, when, or where*. The answer is a single, discrete fact explicitly stated in the text.
+        - **"Medium" (Contextual/Causal Reasoning):** Tests *how* or *why* something happened. The answer requires connecting 1-2 facts, typically from the same paragraph, to understand a process or a relationship.
+        - **"Hard" (Analytical/Synthesis Reasoning):** Tests the *implications, consequences, or comparisons* described in the text. The answer requires synthesizing information from *multiple* sections or paragraphs to form a comprehensive conclusion.
+        </DIFFICULTY_DEFINITIONS>
 
-        Accuracy Guidelines:
-        - If uncertain about a detail, skip it entirely.
-        - Never invent options or add extra entities beyond the article text.
-        - Ensure clean JSON format — no Markdown or commentary.
+        <QUESTION_GENERATION_PROCESS>
+        For *every single question*, you MUST follow this internal process:
+        1.  **Find Quote:** First, identify a concise, verbatim `source_quote` from the `<SOURCE_TEXT>` that contains a meaningful fact.
+        2.  **Formulate Question:** Write a question that tests understanding of that `source_quote`.
+        3.  **Generate Answer:** The `correct_answer` MUST be 100% supported by the `source_quote`.
+        4.  **Generate Distractors:** The `distractors` (incorrect options) MUST be plausible but *factually incorrect* according to the `<SOURCE_TEXT>`. *Never* invent information for distractors that is not related to the article's domain. If plausible distractors cannot be created from the text, find a new fact to test.
+        5.  **Write Explanation:** The `explanation` MUST be a single, concise, declarative sentence.
+            -   It MUST *only* contain the factual reason for the correct answer, based on the `source_quote`.
+            -   It MUST *NEVER* use meta-references or preambles (e.g., "The article states...", "This is correct because...", "As per the text...").
+            -   **Good Example:** "The event took place in 1955 as a protest against segregation."
+            -   **Bad Example:** "As the article explains, the answer is 1955 because that is when the protest occurred."
+        </QUESTION_GENERATION_PROCESS>
 
-        Final Note:
-        Be 'factually strict', 'educationally creative', and 'JSON-accurate'.  
-        Focus on 'teaching through questioning', not tricking the learner.  
-        Avoid speculative, unrelated, or vague information.
+        </MODULE_INSTRUCTIONS>
     """
     )
 
+    # Building the LangChain runnable chain
+    chain: RunnableSequence = prompt | model | parser
 
-    chain = prompt | model | parser
-    result = chain.invoke({"title": article_title, "content": relevant_text})
-    result = chain.invoke({"title": article_title, "content": relevant_text})
+    try:
+        result = chain.invoke({
+            "title": article_title,
+            "content": relevant_text,
+            "difficulty": difficulty
+        })
 
-# Convert Pydantic model → Python dict
-    quiz_json = result.dict() if hasattr(result, "dict") else result.model_dump()
+        quiz_json = result.dict() if hasattr(result, "dict") else result.model_dump()
+        return quiz_json
 
-    return quiz_json
+    except Exception as e:
+        print(f"[Error] Quiz generation failed: {e}")
+        return {"error": str(e), "title": article_title}
 
 

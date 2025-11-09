@@ -48,7 +48,7 @@ export default function QuizDisplay({ quiz, answers }) {
                                     <li
                                         key={i}
                                         className={`border border-slate-200 rounded-lg px-3 py-2 transition cursor-pointer 
-                      hover:bg-blue-50 ${correctClass} ${wrongClass}`}
+                      hover:bg-slate-500 ${correctClass} ${wrongClass}`}
                                     >
                                         {opt}
                                     </li>
@@ -63,9 +63,9 @@ export default function QuizDisplay({ quiz, answers }) {
                         <p className="text-xs text-slate-50 mt-1">{q.explanation}</p>
 
                         {/* ✅ Related Topics */}
-                        <p className="mt-3 text-sm text-slate-200 font-medium">
+                        {q.section && <p className="mt-3 text-sm text-slate-200 font-medium">
                             Related Topic : {q.section}
-                        </p>
+                        </p>}
                     </div>
                 ))}
             </div>

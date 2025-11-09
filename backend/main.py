@@ -7,37 +7,39 @@ from database import SessionLocal, Quiz, init_db
 from llm_quiz_generator import generate_quiz
 import json
 
-init_db()
+init_db() # Creating table if not present
 app = FastAPI(title="AI Wiki Quiz Generator")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["*"],  # allows all origins
     allow_credentials=True,
     allow_methods=["*"],  # allows OPTIONS, POST, GET, etc.
     allow_headers=["*"],
 )
 
+# Model to scrape the Wikipedia
 class URLPreview(BaseModel):
     url: HttpUrl
 
+# Model to request to generate the quiz
 class QuizRequest(BaseModel):
     url: HttpUrl
     difficulty: str
     sections: list[str] | None = None
 
-@app.post("/generate_quiz",description='Getting data from wikipedia',tags=['Quiz'])
+@app.post("/generate_quiz",description='Getting data from wikipedia',tags=['Quiz']) #Srape and stores data in DB
 async def preview_article(payload: URLPreview):
     try:
         scraped = get_or_create_scraped_data(str(payload.url))
         sections = [s["heading"] for s in scraped["sections"]]
         print(f"Got {scraped['title']}'s data!")
-        return {"status":True,"title": scraped["title"], "available_sections": sections,"summary_points":scraped.get("summary_points", [])}
+        return {"status":True,"title": scraped["title"], "available_sections": sections,"summary_points":scraped.get("summary_points", [])} # Returning {title, sections, summary_points}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.put("/generate_quiz", description='Update quiz record with generated AI quiz', tags=['Quiz'])
+@app.put("/generate_quiz", description='Update quiz record with generated AI quiz', tags=['Quiz']) #Generates quiz and update the DB
 def generate_quiz_endpoint(payload: QuizRequest):
     db = SessionLocal()
     try:
@@ -69,7 +71,7 @@ def generate_quiz_endpoint(payload: QuizRequest):
     finally:
         db.close()
 
-@app.get("/history", description='Getting the list of all saved quizzes.', tags=['Quiz'])
+@app.get("/history", description='Getting the list of all saved quizzes.', tags=['Quiz']) # Getting all store records from DB
 def get_history():
     db = SessionLocal()
     try:
@@ -83,11 +85,11 @@ def get_history():
             }
             for r in records
         ]
-        return history
+        return history  # Returning {id, url, title, date_generated}
     finally:
         db.close()
 
-@app.get('/quiz/{quiz_id}',description="Getting the specific quiz based on the id", tags=['Quiz'])
+@app.get('/quiz/{quiz_id}',description="Getting the specific quiz based on the id", tags=['Quiz']) #For displaying each quiz using its id.
 def get_quiz(quiz_id:int):
     db=SessionLocal()
     try:

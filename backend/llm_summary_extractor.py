@@ -4,12 +4,12 @@ from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate
 
-load_dotenv()
-
+load_dotenv() # Loading API keys from .env
+api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
 # Initialize model (fast and stable)
 summary_model = ChatGoogleGenerativeAI(
-    model="models/gemini-2.5-flash-lite",  # ✅ Fast & efficient for summaries
-    google_api_key=os.getenv("GEMINI_API_KEY_2"),
+    model="models/gemini-2.5-flash-lite",  # For Fast & efficient summaries
+    google_api_key=api_key,
     temperature=0.25,
 )
 

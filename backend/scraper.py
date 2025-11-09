@@ -9,29 +9,30 @@ headers = {
 }
 
 def remove_reference_links(content_tag):
-    for sup in content_tag.find_all("sup"):
+    for sup in content_tag.find_all("sup"): # Removing external links
         sup.decompose()
     return content_tag
 
 def remove_tables(content_tag):
-    for table in content_tag.find_all("table"):
+    for table in content_tag.find_all("table"): # Removing unnessesary tables
         table.decompose()
     return content_tag
 
 def scrape_wikipedia(url):
-    res = requests.get(url, headers=headers, timeout=10)
+    res = requests.get(url, headers=headers, timeout=10)    # Getting wikipedia raw data
     res.raise_for_status()
-    soup = BeautifulSoup(res.text, "lxml")
+    soup = BeautifulSoup(res.text, "lxml") # Scraping using BeautifulSoup
 
-    title_tag = soup.find("h1", id="firstHeading")
+    title_tag = soup.find("h1", id="firstHeading")  # Finding heading in scraped data
     title = title_tag.get_text(strip=True) if title_tag else "Untitled"
 
-    content_div = soup.find("div", id="mw-content-text")
+    content_div = soup.find("div", id="mw-content-text")    # Finding contents in scraped data
     if not content_div:
         raise ValueError("Main content not found")
 
     content_div = remove_reference_links(content_div)
     content_div = remove_tables(content_div)
+    # sections to exclude to avoid overhead to the AI model
     EXCLUDED_SECTIONS = {
         "see also",
         "notes",
