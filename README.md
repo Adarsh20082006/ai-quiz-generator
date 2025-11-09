@@ -100,6 +100,20 @@ flowchart TD
     M --> I
 ```
 ---
+
+## Screenshots
+
+<img width="1190" height="956" alt="image" src="https://github.com/user-attachments/assets/c6689f34-ca24-4426-8139-7e3d5bf8833b" />
+<img width="862" height="308" alt="image" src="https://github.com/user-attachments/assets/f5f8ebf3-2a5e-422a-906e-6c2c22fe715a" />
+<img width="857" height="278" alt="image" src="https://github.com/user-attachments/assets/2af28bfe-ed4e-4c02-a7a8-3c7aecfb8e14" />
+<img width="1002" height="818" alt="image" src="https://github.com/user-attachments/assets/d088ddd8-75c6-4113-9761-cc7e34f1a583" />
+<img width="987" height="638" alt="image" src="https://github.com/user-attachments/assets/f16b1f4b-55cb-4375-abcf-bfe280bb3464" />
+<img width="1018" height="971" alt="image" src="https://github.com/user-attachments/assets/63fe866b-406d-4ac1-9e59-2535b4eb7af9" />
+<img width="1180" height="680" alt="image" src="https://github.com/user-attachments/assets/ef2b2cfd-5d74-406b-8fcd-3c2c30d02209" />
+
+
+
+
 #### Output JSON Format
 ```json
 {
