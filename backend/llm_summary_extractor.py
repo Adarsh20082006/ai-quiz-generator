@@ -32,8 +32,6 @@ Example:
 Article Title: {title}
 Article Content:
 {content}
-
-
 """)
 
 import json

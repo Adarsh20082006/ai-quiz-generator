@@ -105,6 +105,10 @@ def generate_quiz(article_title: str, structured_content: dict, difficulty="Medi
         - You MUST generate *exactly 8* multiple-choice questions.
         - The difficulty distribution is NOT flexible and is determined by the {difficulty} input.
 
+        ### 5. For each questions, add the related sections that are suggested to user to read to get more insights of this question.
+        - Sections should directly related to the question.
+        - Max of 1-3 sections.
+        
         <DIFFICULTY_LOGIC>
         - **IF {difficulty} == "Easy":**
         - Generate **6 "Easy"** questions.

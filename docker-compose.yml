@@ -1,21 +1,6 @@
 services:
-  frontend:
-    build: ./frontend
-    container_name: ai-quiz-frontend
-    restart: always
-    depends_on:
-      - backend
-    ports:
-      - "5173:5173"
-    environment:
-      - VITE_API_BASE_URL=http://localhost:8000
-    stdin_open: true
-    tty: true
-
   db:
     image: mysql:8.0
-    container_name: ai-quiz-db
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: Adarsh206
       MYSQL_DATABASE: ai_quiz_db
@@ -23,21 +8,33 @@ services:
       - "3310:3306"
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-pAdarsh206" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build: ./backend
-    container_name: ai-quiz-backend
-    restart: always
-    depends_on:
-      - db
-    env_file:
-      - ./backend/.env
-    environment:
-      - GOOGLE_API_KEY=AIzaSyDR_CpmcMDfhW1GHStfS-L-n4CXONbCFJ4
-      - GEMINI_API_KEY=AIzaSyDR_CpmcMDfhW1GHStfS-L-n4CXONbCFJ4
-      - DATABASE_URL=mysql+pymysql://root:Adarsh206@db:3306/ai_quiz_db
     ports:
       - "8000:8000"
+    environment:
+      - PORT=8000
+      - DATABASE_URL=mysql+pymysql://root:Adarsh206@db:3306/ai_quiz_db
+      - GOOGLE_API_KEY=AIzaSyDR_CpmcMDfhW1GHStfS-L-n4CXONbCFJ4
+      - GEMINI_API_KEY=AIzaSyDR_CpmcMDfhW1GHStfS-L-n4CXONbCFJ4
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000
+    depends_on:
+      - backend
 
 volumes:
   db_data:
