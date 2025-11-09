@@ -1,0 +1,146 @@
+URL = https://en.wikipedia.org/wiki/Srinivasa_Ramanujan
+
+
+    {
+    "id": 5,
+    "url": "https://en.wikipedia.org/wiki/Srinivasa_Ramanujan",
+    "title": "Srinivasa Ramanujan",
+    "summary": "Srinivasa Ramanujan was an Indian mathematician known for his extraordinary mathematical insights and contributions, despite a lack of formal training. He attributed his acumen to his family goddess and often expressed a divine connection to mathematics. His extensive notebooks, filled with theorems and results, have profoundly influenced subsequent mathematical research.",
+    "key_entities": {
+        "people": [
+        "Srinivasa Ramanujan",
+        "G. H. Hardy",
+        "Bruce C. Berndt",
+        "Littlewood",
+        "Janaki",
+        "V. Ramaswamy Aiyer",
+        "R. Ramachandra Rao"
+        ],
+        "organizations": [
+        "Tata Institute of Fundamental Research",
+        "Journal of the Indian Mathematical Society",
+        "SASTRA University",
+        "University of Madras",
+        "London Mathematical Society",
+        "Royal Society",
+        "Trinity College, Cambridge"
+        ],
+        "locations": [
+        "Cambridge",
+        "Madras (now Chennai)",
+        "Kumbakonam",
+        "Tamil Nadu",
+        "India",
+        "London",
+        "Erode"
+        ]
+    },
+    "sections": [Mathematicians],
+    "quiz": [
+        {
+        "question": "On what date was Srinivasa Ramanujan born?",
+        "options": [
+            "22 December 1887",
+            "17 March 1914",
+            "14 April 1914",
+            "1 October 1892"
+        ],
+        "answer": "22 December 1887",
+        "difficulty": "easy",
+        "explanation": "Ramanujan was born in British ruled India on 22 December 1887.",
+        "section": null
+        },
+        {
+        "question": "What was Ramanujan's father's name?",
+        "options": [
+            "Kuppuswamy Srinivasa Iyengar",
+            "P. V. Seshu Aiyar",
+            "B. M. Wilson",
+            "G. H. Hardy"
+        ],
+        "answer": "Kuppuswamy Srinivasa Iyengar",
+        "difficulty": "easy",
+        "explanation": "His father, Kuppuswamy Srinivasa Iyengar, worked as a clerk in a sari shop.",
+        "section": null
+        },
+        {
+        "question": "To whom did Ramanujan credit his mathematical acumen?",
+        "options": [
+            "Namagiri Thayar",
+            "Komalatammal",
+            "Janaki",
+            "Narasimha"
+        ],
+        "answer": "Namagiri Thayar",
+        "difficulty": "easy",
+        "explanation": "He credited his acumen to his family goddess, Namagiri Thayar.",
+        "section": null
+        },
+        {
+        "question": "When was Ramanujan first enrolled at a local school?",
+        "options": [
+            "1 October 1892",
+            "22 December 1887",
+            "November 1897",
+            "December 1889"
+        ],
+        "answer": "1 October 1892",
+        "difficulty": "easy",
+        "explanation": "On 1 October 1892, Ramanujan was enrolled at the local school.",
+        "section": null
+        },
+        {
+        "question": "What day is celebrated annually as National Mathematics Day in India?",
+        "options": [
+            "22 December",
+            "17 March",
+            "14 April",
+            "13 October"
+        ],
+        "answer": "22 December",
+        "difficulty": "easy",
+        "explanation": "The Indian government declared that 22 December will be celebrated every year as National Mathematics Day.",
+        "section": null
+        },
+        {
+        "question": "Who was the first Indian admitted as a Fellow of the Royal Society?",
+        "options": [
+            "Ardaseer Cursetjee",
+            "Srinivasa Ramanujan",
+            "G. H. Hardy",
+            "B. M. Wilson"
+        ],
+        "answer": "Ardaseer Cursetjee",
+        "difficulty": "easy",
+        "explanation": "He was elected a Fellow of the Royal Society, the second Indian admitted, after Ardaseer Cursetjee in 1841.",
+        "section": null
+        },
+        {
+        "question": "According to Bruce C. Berndt, why might Ramanujan have used slate for his mathematical work?",
+        "options": [
+            "He could not afford paper to record results more permanently",
+            "He preferred the feel of slate over paper",
+            "Slate was a traditional tool for advanced mathematicians",
+            "He wanted to keep his intermediate results secret"
+        ],
+        "answer": "He could not afford paper to record results more permanently",
+        "difficulty": "medium",
+        "explanation": "Berndt speculated that Ramanujan worked out intermediate results on slate that he could not afford the paper to record more permanently.",
+        "section": null
+        },
+        {
+        "question": "What was a primary point of conflict in the collaboration between Hardy and Ramanujan?",
+        "options": [
+            "Hardy's emphasis on formal proofs contrasted with Ramanujan's reliance on intuition",
+            "Their differing views on the importance of publishing papers",
+            "Their disagreement over the best location for mathematical research",
+            "Hardy's belief that Ramanujan's work was too simple"
+        ],
+        "answer": "Hardy's emphasis on formal proofs contrasted with Ramanujan's reliance on intuition",
+        "difficulty": "medium",
+        "explanation": "Hardy was an apostle of proof and mathematical rigour, whereas Ramanujan was a deeply religious man who relied very strongly on his intuition and insights, leading to a conflict that neither found easy.",
+        "section": null
+        }
+    ],
+    "related_topics": []
+    }
