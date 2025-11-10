@@ -17,7 +17,6 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://ai-quiz-generator-1-f7c7.onrender.com",
-        "https://ai-quiz-generator-dqj9.onrender.com",
         "http://localhost:5173"
     ],
     allow_credentials=True,
@@ -65,32 +64,42 @@ async def preview_article(payload: URLPreview):
 def generate_quiz_endpoint(payload: QuizRequest):
     db = SessionLocal()
     try:
-        print(f"Received request for quiz: {payload.url}")
+        print(f"[REQUEST] Generating quiz for {payload.url} | Difficulty: {payload.difficulty}")
+
         existing = db.query(Quiz).filter(Quiz.url == str(payload.url)).first()
         if not existing:
             raise HTTPException(status_code=404, detail="Scraped data not found. Please run /generate_quiz (POST) first.")
+
         scraped_data = json.loads(existing.scraped_content)
-        print("Scraped data loaded successfully.")
-        
+        print("[INFO] Scraped data loaded successfully.")
+
         quiz = generate_quiz(
             article_title=scraped_data["title"],
             structured_content=scraped_data,
             difficulty=payload.difficulty,
             selected_sections=payload.sections
         )
-        print("Quiz generation successful.")
-        
-        existing.full_quiz_data = json.dumps(quiz, ensure_ascii=False)
 
+        if "error" in quiz:
+            print(f"[LLM ERROR] {quiz['error']}")
+            raise HTTPException(status_code=500, detail=quiz["error"])
+
+        print("[INFO] Quiz generation successful.")
+        existing.full_quiz_data = json.dumps(quiz, ensure_ascii=False)
         db.commit()
+
         return {"status": True, "quiz": quiz}
+
     except Exception as e:
         db.rollback()
         import traceback
         traceback.print_exc()
+        print(f"[EXCEPTION] {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error generating quiz: {str(e)}")
+
     finally:
         db.close()
+
 
 
 @app.get("/history", description='Getting the list of all saved quizzes.', tags=['Quiz']) # Getting all store records from DB
