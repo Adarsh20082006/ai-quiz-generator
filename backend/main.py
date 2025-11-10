@@ -17,6 +17,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://ai-quiz-generator-1-f7c7.onrender.com",
+        "https://ai-quiz-generator-dqj9.onrender.com",
         "http://localhost:5173"
     ],
     allow_credentials=True,
@@ -71,15 +72,23 @@ def generate_quiz_endpoint(payload: QuizRequest):
         scraped_data = json.loads(existing.scraped_content)
         print("Scraped data loaded successfully.")
         
-        quiz = generate_quiz(scraped_data, payload.difficulty, payload.sections or [])
+        quiz = generate_quiz(
+            article_title=scraped_data["title"],
+            structured_content=scraped_data,
+            difficulty=payload.difficulty,
+            selected_sections=payload.sections
+        )
         print("Quiz generation successful.")
         
-        existing.quiz_json = json.dumps(quiz)
+        existing.full_quiz_data = json.dumps(quiz, ensure_ascii=False)
+
         db.commit()
         return {"status": True, "quiz": quiz}
     except Exception as e:
-        print(f"Error: {e}")
-        raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
+        db.rollback()
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error generating quiz: {str(e)}")
     finally:
         db.close()
 
