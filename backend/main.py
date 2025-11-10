@@ -1,4 +1,3 @@
-# main.py
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, HttpUrl
@@ -7,9 +6,13 @@ from database import SessionLocal, Quiz, init_db
 from llm_quiz_generator import generate_quiz
 import json
 
-init_db() # Creating table if not present
+# Initialize DB
+init_db()
+
+# FastAPI App
 app = FastAPI(title="AI Wiki Quiz Generator")
 
+# CORS Middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -21,6 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Model to scrape the Wikipedia
 class URLPreview(BaseModel):
     url: HttpUrl
@@ -31,9 +35,19 @@ class QuizRequest(BaseModel):
     difficulty: str
     sections: list[str] | None = None
 
+
+# Health route
 @app.get("/")
 def root():
-    return {"message": "Backend running successfully on Render!"}
+    return {"message": "Backend is running and CORS is enabled!"}
+
+# ... your POST/PUT routes below ...
+
+# Handles all CORS preflight requests
+@app.options("/{rest_of_path:path}")
+async def preflight_handler(rest_of_path: str):
+    return {}
+
 
 @app.post("/generate_quiz",description='Getting data from wikipedia',tags=['Quiz']) #Srape and stores data in DB
 async def preview_article(payload: URLPreview):
