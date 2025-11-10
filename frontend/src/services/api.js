@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const API_BASE = "https://ai-quiz-generator-dqj9.onrender.com";
+export const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export const previewArticle = async (url) => {
     const { data } = await axios.post(`${API_BASE}/generate_quiz`, { url });
