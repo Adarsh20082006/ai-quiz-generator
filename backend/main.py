@@ -17,6 +17,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://ai-quiz-generator-1-f7c7.onrender.com",
+        "https://ai-quiz-generator-dqj9.onrender.com",
         "http://localhost:5173"
     ],
     allow_credentials=True,
