@@ -12,7 +12,10 @@ app = FastAPI(title="AI Wiki Quiz Generator")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # allows all origins
+    allow_origins=[
+        "https://ai-quiz-generator-1-f7c7.onrender.com",
+        "http://localhost:5173"
+    ],  # allows all origins
     allow_credentials=True,
     allow_methods=["*"],  # allows OPTIONS, POST, GET, etc.
     allow_headers=["*"],
