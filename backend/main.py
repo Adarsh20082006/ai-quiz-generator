@@ -43,11 +43,6 @@ def root():
 
 # ... your POST/PUT routes below ...
 
-# Handles all CORS preflight requests
-@app.options("/{rest_of_path:path}")
-async def preflight_handler(rest_of_path: str):
-    return {}
-
 @app.get("/debug")
 def debug_env():
     import os
