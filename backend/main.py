@@ -48,6 +48,13 @@ def root():
 async def preflight_handler(rest_of_path: str):
     return {}
 
+@app.get("/debug")
+def debug_env():
+    import os
+    return {
+        "GOOGLE_API_KEY_SET": bool(os.getenv("GOOGLE_API_KEY")),
+        "GEMINI_API_KEY_SET": bool(os.getenv("GEMINI_API_KEY"))
+    }
 
 @app.post("/generate_quiz",description='Getting data from wikipedia',tags=['Quiz']) #Srape and stores data in DB
 async def preview_article(payload: URLPreview):
