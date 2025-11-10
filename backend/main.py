@@ -15,9 +15,9 @@ app.add_middleware(
     allow_origins=[
         "https://ai-quiz-generator-1-f7c7.onrender.com",
         "http://localhost:5173"
-    ],  # allows all origins
+    ],
     allow_credentials=True,
-    allow_methods=["*"],  # allows OPTIONS, POST, GET, etc.
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -31,6 +31,10 @@ class QuizRequest(BaseModel):
     difficulty: str
     sections: list[str] | None = None
 
+@app.get("/")
+def root():
+    return {"message": "Backend running successfully on Render!"}
+
 @app.post("/generate_quiz",description='Getting data from wikipedia',tags=['Quiz']) #Srape and stores data in DB
 async def preview_article(payload: URLPreview):
     try:
@@ -42,37 +46,29 @@ async def preview_article(payload: URLPreview):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.put("/generate_quiz", description='Update quiz record with generated AI quiz', tags=['Quiz']) #Generates quiz and update the DB
+@app.put("/generate_quiz", description="Update quiz record with generated AI quiz", tags=["Quiz"])
 def generate_quiz_endpoint(payload: QuizRequest):
     db = SessionLocal()
     try:
-        # Fetch scraped content from DB (must exist already)
+        print(f"Received request for quiz: {payload.url}")
         existing = db.query(Quiz).filter(Quiz.url == str(payload.url)).first()
         if not existing:
-            raise HTTPException(status_code=404, detail="Scraped data not found. Please run /get-data first.")
-
+            raise HTTPException(status_code=404, detail="Scraped data not found. Please run /generate_quiz (POST) first.")
         scraped_data = json.loads(existing.scraped_content)
-
-        # Generate quiz using the already scraped content
-        quiz_json = generate_quiz(
-            article_title=scraped_data["title"],
-            structured_content=scraped_data,
-            difficulty=payload.difficulty,
-            selected_sections=payload.sections
-        )
-        quiz_json['id']=existing.id
-        existing.full_quiz_data = json.dumps(quiz_json, ensure_ascii=False)# Serialize Python dictionary into JSON string for database storage
+        print("Scraped data loaded successfully.")
+        
+        quiz = generate_quiz(scraped_data, payload.difficulty, payload.sections or [])
+        print("Quiz generation successful.")
+        
+        existing.quiz_json = json.dumps(quiz)
         db.commit()
-        db.refresh(existing)
-
-        print(f"Quiz generated and stored for '{scraped_data['title']}'")
-        return quiz_json
-
+        return {"status": True, "quiz": quiz}
     except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error generating quiz: {str(e)}")
+        print(f"Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
     finally:
         db.close()
+
 
 @app.get("/history", description='Getting the list of all saved quizzes.', tags=['Quiz']) # Getting all store records from DB
 def get_history():
