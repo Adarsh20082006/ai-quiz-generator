@@ -15,11 +15,7 @@ app = FastAPI(title="AI Wiki Quiz Generator")
 # CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://ai-quiz-generator-1-f7c7.onrender.com",
-        "https://ai-quiz-generator-dqj9.onrender.com",
-        "http://localhost:5173"
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -42,7 +38,7 @@ class QuizRequest(BaseModel):
 def root():
     return {"message": "Backend is running and CORS is enabled!"}
 
-# ... your POST/PUT routes below ...
+# ...  POST/PUT routes below ...
 
 
 @app.get("/debug")
@@ -65,7 +61,7 @@ async def preview_article(payload: URLPreview):
 
 
 @app.put("/generate_quiz", description="Update quiz record with generated AI quiz", tags=["Quiz"])
-def generate_quiz_endpoint(payload: QuizRequest):
+async def generate_quiz_endpoint(payload: QuizRequest):
     db = SessionLocal()
     try:
         print(f"[REQUEST] Generating quiz for {payload.url} | Difficulty: {payload.difficulty}")
