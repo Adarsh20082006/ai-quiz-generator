@@ -131,7 +131,7 @@ def generate_quiz(article_title: str, structured_content: dict, difficulty="Medi
             "content": relevant_text,
             "difficulty": difficulty
         })
-
+        print(result)
         quiz_json = result.dict() if hasattr(result, "dict") else result.model_dump()
         return quiz_json
 
