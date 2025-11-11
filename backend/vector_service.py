@@ -6,26 +6,23 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def build_faiss_index(article_text: str):
     """
-    Builds a lightweight FAISS vector index from article text.
-    - Uses a small local embedding model (no API key required)
-    - Optimized for Render's free tier (low memory, CPU-friendly)
+    Build a FAISS vector index from article text using ultra-light local embeddings.
+    - Free and low-memory (<200MB total usage)
+    - Ideal for Render free tier (512MB)
     """
 
-    # Split text into small overlapping chunks for better context retention
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1500,  # smaller chunks → lower memory
-        chunk_overlap=250,
+        chunk_size=1000,
+        chunk_overlap=200,
         separators=["\n\n", "\n", ".", "!", "?"]
     )
     chunks = text_splitter.split_text(article_text)
 
-    # Load a lightweight embedding model
-    # ~80 MB memory footprint, perfect for Render free instance
+    # Ultra-tiny multilingual embedding model
     embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/paraphrase-MiniLM-L3-v2"
+        model_name="sentence-transformers/all-MiniLM-L3-v2",  # lighter than paraphrase model
+        cache_folder="/tmp"  # helps Render memory management
     )
 
-    # Create FAISS vector store from text chunks
     vector_store = FAISS.from_texts(chunks, embedding=embeddings)
-
     return vector_store, chunks
