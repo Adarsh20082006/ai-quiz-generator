@@ -24,6 +24,7 @@ langchain-google-genai==1.0.6
 # Embeddings & Vector Store
 faiss-cpu==1.8.0.post1
 sentence-transformers==3.0.1
+langchain-openai
 
 # Data validation
 pydantic==2.9.2
