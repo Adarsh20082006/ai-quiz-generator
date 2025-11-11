@@ -8,12 +8,16 @@ export const previewArticle = async (url) => {
 };
 
 export const generateQuiz = async ({ url, difficulty, sections }) => {
-    const { data } = await axios.put(`${API_BASE}/generate_quiz`, {
-        url, difficulty, sections
-    });
-    return data; // full quiz JSON
+    try {
+        const { data } = await axios.put(`${API_BASE}/generate_quiz`, {
+            url, difficulty, sections
+        });
+        return data;
+    } catch (error) {
+        console.error("Quiz generation failed:", error.response?.data || error.message);
+        throw error;
+    }
 };
-
 export const getHistory = async () => {
     const { data } = await axios.get(`${API_BASE}/history`);
     return data; // [{id,url,title,date_generated}, ...]
