@@ -6,7 +6,7 @@ export default function QuizDisplay({ quiz, answers }) {
     return (
         <div className="bg-[#1e293b] rounded-2xl min-h-screen p-4">
             <div className="max-w-3xl mx-auto space-y-6">
-                {quiz?.quiz_data?.quiz.map((q, idx) => (
+                {quiz?.quiz_data?.quiz.length > 0 && quiz?.quiz_data?.quiz.map((q, idx) => (
                     <div
                         key={idx}
                         className="bg-slate-700 border border-slate-800 rounded-xl shadow-md p-5 hover:shadow-lg transition"
