@@ -5,7 +5,6 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from models import QuizOutput
-from vector_service import build_faiss_index
 from langchain_core.runnables import RunnableSequence
 
 load_dotenv()
@@ -33,13 +32,9 @@ def generate_quiz(article_title: str, structured_content: dict, difficulty="Medi
         (s.get("content", "")) + " " + " ".join(sub.get("content", "") for sub in s.get("subsections", []))
         for s in sections
     )
+    # Directly use article text (skip embeddings + FAISS)
+    relevant_text = article_text
 
-    # Building FAISS index for semantic relevance
-    vector_store, _ = build_faiss_index(article_text)
-    query = f"important facts, achievements, and insights about {article_title}"
-    retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 10})
-    docs = retriever.invoke(query)
-    relevant_text = "\n".join([d.page_content for d in docs])
 
     # Creating the prompt
     prompt = PromptTemplate(
