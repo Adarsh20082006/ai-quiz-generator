@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const API_BASE = import.meta.env.VITE_API_BASE_URL;
-
+console.log(API_BASE)// http://localhost:8000
 //  Fetch Wikipedia article preview
 export const previewArticle = async (url) => {
   const { data } = await axios.post(`${API_BASE}/generate_quiz`, { url });
@@ -41,9 +41,8 @@ export async function generateQuiz(payload) {
             "The AI request quota has been exceeded. Please wait and try again later.";
           break;
         default:
-          userMessage = `Server Error (${status}): ${
-            error.response.data.detail || "Unexpected issue occurred."
-          }`;
+          userMessage = `Server Error (${status}): ${error.response.data.detail || "Unexpected issue occurred."
+            }`;
       }
     } else if (error.request) {
       userMessage =
@@ -60,6 +59,7 @@ export async function generateQuiz(payload) {
 
 //  Fetch all saved quizzes
 export const getHistory = async () => {
+  console.log(API_BASE)
   const { data } = await axios.get(`${API_BASE}/history`);
   return data; // [{id,url,title,date_generated}, ...]
 };

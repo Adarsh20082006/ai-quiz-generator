@@ -15,9 +15,10 @@ app = FastAPI(title="AI Wiki Quiz Generator")
 # CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-    "https://ai-quiz-generator-1-f7c7.onrender.com",
-    "https://ai-quiz-generator-dqj9.onrender.com"
+     allow_origins=[
+        "http://localhost:5173",
+        "https://ai-quiz-generator-1-f7c7.onrender.com",
+        "https://ai-quiz-generator-dqj9.onrender.com"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -91,7 +92,12 @@ async def generate_quiz_endpoint(payload: QuizRequest):
         existing.full_quiz_data = json.dumps(quiz, ensure_ascii=False)
         db.commit()
 
-        return {"status": True, "quiz": quiz}
+        # return {"status": True, "quiz": quiz}
+        return {
+            "status": True,
+            "id": existing.id,
+            "quiz": quiz
+        }
 
     except Exception as e:
         db.rollback()

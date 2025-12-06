@@ -17,7 +17,7 @@ export default function GenerateQuiz() {
     const navigate = useNavigate();
     const pollTimeoutRef = useRef(null);
 
-    // ✅ Validate Wikipedia URL
+    // Validate Wikipedia URL
     const isWikipediaUrl = (url) => {
         try {
             const parsed = new URL(url);
@@ -27,7 +27,7 @@ export default function GenerateQuiz() {
         }
     };
 
-    // ✅ Handle URL Preview Validation
+    // Handle URL Preview Validation
     const handlePreview = async () => {
         const errors = {};
         if (!url.trim() || url == "") {
@@ -54,7 +54,7 @@ export default function GenerateQuiz() {
         }
     };
 
-    // ✅ Toggle Section Selection
+    // Toggle Section Selection
     const toggleSection = (sec) => {
         setSelectedSections((prev) =>
             prev.includes(sec) ? prev.filter((s) => s !== sec) : [...prev, sec]
@@ -62,78 +62,53 @@ export default function GenerateQuiz() {
     };
 
     const handleGenerate = async () => {
-  const errors = {};
-  if (!url || !isWikipediaUrl(url)) {
-    errors.url = "Invalid or missing Wikipedia URL.";
-  }
-  if (!difficulty) {
-    errors.difficulty = "Please select a difficulty level.";
-  }
-  if (!selectedSections.length) {
-    errors.sections = "Select at least one section to focus on.";
-  }
+        const errors = {};
+        if (!url || !isWikipediaUrl(url)) {
+            errors.url = "Invalid or missing Wikipedia URL.";
+        }
+        if (!difficulty) {
+            errors.difficulty = "Please select a difficulty level.";
+        }
+        if (!selectedSections.length) {
+            errors.sections = "Select at least one section to focus on.";
+        }
 
-  if (Object.keys(errors).length > 0) {
-    setFieldErrors(errors);
-    return;
-  }
+        if (Object.keys(errors).length > 0) {
+            setFieldErrors(errors);
+            return;
+        }
 
-  setLoading(true);
-  setModalOpen(true);
-  setCheckingStatus("STARTED");
+        setLoading(true);
+        setModalOpen(true);
+        setCheckingStatus("STARTED");
 
-  try {
-    // Step 1: Generate quiz via backend
-    const quizData = await generateQuiz({
-      url,
-      difficulty,
-      sections: selectedSections,
-    });
+        try {
+            // Step 1: Generate quiz via backend
+            const quizData = await generateQuiz({
+                url,
+                difficulty,
+                sections: selectedSections,
+            });
+            if (quizData && quizData.id) {
+                navigate(`/quiz/${quizData.id}`, { state: { quiz: quizData.quiz } });
+                return;
+            }
 
-    if (quizData && quizData.quiz) {
-      // 🕐 Step 2: Wait briefly to ensure DB commit on Render
-      await new Promise((res) => setTimeout(res, 800));
+            // Step 6: If no quiz data
+            setCheckingStatus("FAILED");
+            setError("Something went wrong — no quiz data received.");
+            setModalOpen(false);
+        } catch (e) {
+            console.error("Quiz generation error:", e);
+            setCheckingStatus("FAILED");
+            setError(e?.response?.data?.detail || "Failed to generate quiz");
+            setModalOpen(false);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-      // 🧾 Step 3: Fetch /history and find matching record by URL
-      const historyResponse = await fetch(
-        "https://ai-quiz-generator-dqj9.onrender.com/history"
-      );
-      const history = await historyResponse.json();
-
-      const matchedQuiz = history.find((q) => q.url === url);
-
-      // 🚀 Step 4: Navigate to quiz display with correct ID
-      if (matchedQuiz) {
-        setQuiz(quizData.quiz);
-        setCheckingStatus("SUCCESS");
-        setModalOpen(false);
-        navigate(`/quiz/${matchedQuiz.id}`, { state: { quiz: quizData.quiz } });
-        return;
-      }
-
-      // ⚠️ Step 5: Fallback if not found in /history
-      setQuiz(quizData.quiz);
-      setCheckingStatus("SUCCESS");
-      setModalOpen(false);
-      navigate(`/quiz/temp`, { state: { quiz: quizData.quiz } });
-      return;
-    }
-
-    // ❌ Step 6: If no quiz data
-    setCheckingStatus("FAILED");
-    setError("Something went wrong — no quiz data received.");
-    setModalOpen(false);
-  } catch (e) {
-    console.error("Quiz generation error:", e);
-    setCheckingStatus("FAILED");
-    setError(e?.response?.data?.detail || "Failed to generate quiz");
-    setModalOpen(false);
-  } finally {
-    setLoading(false);
-  }
-};
-
-    // ✅ Cleanup polling
+    // Cleanup polling
     useEffect(() => {
         return () => {
             if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);

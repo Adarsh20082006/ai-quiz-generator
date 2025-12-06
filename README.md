@@ -299,13 +299,7 @@ docker exec -it <mysql_container_id> mysql -u root -p
 - Caching to prevent duplicate scraping of the same URL.
 - Section-wise question grouping in UI.
 
-## ❓ Troubleshooting
-Issue	Cause	Fix
-Frontend not loading	Vite not listening on 0.0.0.0	Update Dockerfile to expose host
-CORS error	API origin mismatch	Allow CORS in FastAPI and update VITE_API_BASE_URL
-MySQL connection error	Wrong host in DATABASE_URL	Use db (not localhost) in the connection string
-
-### ☁️ Deploying on Render (Optional)
+### ☁️ Deploying on Render 
 Deploy backend as a Docker service (choose backend/ directory).
 
 Deploy frontend as a Static Site or Docker app (choose frontend/).
